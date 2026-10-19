@@ -122,6 +122,10 @@ func (u *URLTest) fast(touch bool) C.Proxy {
 		for _, proxy := range proxies[1:] {
 			if u.fastNode != nil && proxy.Name() == u.fastNode.Name() {
 				fastNotExist = false
+				// A provider recreates its proxy objects whenever the fetched content
+				// changes, so the stored fastNode may be a stale object that no health
+				// check updates any more. Keep the name, but switch to the current object.
+				u.fastNode = proxy
 			}
 
 			if !proxy.AliveForTestUrl(u.testUrl) {
