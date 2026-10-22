@@ -57,6 +57,7 @@ func (u *URLTest) ForceSet(name string) {
 func (u *URLTest) DialContext(ctx context.Context, metadata *C.Metadata) (c C.Conn, err error) {
 	proxy := u.fast(true)
 	c, err = proxy.DialContext(ctx, metadata)
+	u.diagDialed(err)
 	if err == nil {
 		c.AppendToChains(u)
 	} else {
@@ -80,6 +81,7 @@ func (u *URLTest) DialContext(ctx context.Context, metadata *C.Metadata) (c C.Co
 func (u *URLTest) ListenPacketContext(ctx context.Context, metadata *C.Metadata) (C.PacketConn, error) {
 	proxy := u.fast(true)
 	pc, err := proxy.ListenPacketContext(ctx, metadata)
+	u.diagDialed(err)
 	if err == nil {
 		pc.AppendToChains(u)
 	} else {
@@ -110,7 +112,7 @@ func (u *URLTest) fast(touch bool) C.Proxy {
 				}
 				if proxy.Name() == u.selected {
 					u.fastNode = proxy
-					return proxy, nil
+					return u.diagPick(proxy, "fixed", nil, nil, 0), nil
 				}
 			}
 		}
@@ -141,8 +143,9 @@ func (u *URLTest) fast(touch bool) C.Proxy {
 
 		// tolerance
 		if current == nil || !current.AliveForTestUrl(u.testUrl) {
+			reason := diagUnavailable(u.fastNode, current)
 			u.fastNode = fast
-			return fast, nil
+			return u.diagPick(fast, reason, current, fast, minDelay), nil
 		}
 
 		// A recreated proxy has no result for testUrl until the health check reaches it,
@@ -157,12 +160,12 @@ func (u *URLTest) fast(touch bool) C.Proxy {
 		// int, not uint16: a missing delay (0xffff) plus tolerance would wrap around
 		if !judged.AliveForTestUrl(u.testUrl) || int(judged.LastDelayForTestUrl(u.testUrl)) > int(minDelay)+int(u.tolerance) {
 			u.fastNode = fast
-			return fast, nil
+			return u.diagPick(fast, diagSlower(judged, u.testUrl), judged, fast, minDelay), nil
 		}
 
 		// keep the tested object as the reference until current gets its own result
 		u.fastNode = judged
-		return current, nil
+		return u.diagPick(current, diagKeep(judged, current), judged, fast, minDelay), nil
 	})
 	if shared && touch { // a shared fastSingle.Do() may cause providers untouched, so we touch them again
 		u.Touch()

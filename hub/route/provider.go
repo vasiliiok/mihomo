@@ -3,6 +3,7 @@ package route
 import (
 	"context"
 
+	"github.com/metacubex/mihomo/component/diag"
 	C "github.com/metacubex/mihomo/constant"
 	P "github.com/metacubex/mihomo/constant/provider"
 	"github.com/metacubex/mihomo/tunnel"
@@ -51,6 +52,7 @@ func getProvider(w http.ResponseWriter, r *http.Request) {
 
 func updateProvider(w http.ResponseWriter, r *http.Request) {
 	provider := r.Context().Value(CtxKeyProvider).(P.ProxyProvider)
+	diag.Log("api", "provider-update provider=%q", provider.Name())
 	if err := provider.Update(); err != nil {
 		render.Status(r, http.StatusServiceUnavailable)
 		render.JSON(w, r, newError(err.Error()))
@@ -61,6 +63,7 @@ func updateProvider(w http.ResponseWriter, r *http.Request) {
 
 func healthCheckProvider(w http.ResponseWriter, r *http.Request) {
 	provider := r.Context().Value(CtxKeyProvider).(P.ProxyProvider)
+	diag.Log("api", "provider-healthcheck provider=%q", provider.Name())
 	provider.HealthCheck()
 	render.NoContent(w, r)
 }

@@ -103,6 +103,7 @@ func (bp *baseProvider) RegisterHealthCheckTask(url string, expectedStatus utils
 func (bp *baseProvider) setProxies(proxies []C.Proxy) {
 	bp.mutex.Lock()
 	defer bp.mutex.Unlock()
+	diagSetProxies(bp.name, bp.version+1, bp.proxies, proxies)
 	bp.proxies = proxies
 	bp.version += 1
 	bp.healthCheck.setProxies(proxies)
@@ -189,6 +190,7 @@ func NewProxySetProvider(name string, interval time.Duration, payload []map[stri
 			healthCheck: hc,
 		},
 	}
+	hc.name = name
 
 	if len(payload) > 0 { // using as fallback proxies
 		ps := ProxySchema{Proxies: payload}
@@ -270,6 +272,7 @@ func NewInlineProvider(name string, payload []map[string]any, parser resource.Pa
 	}
 	// direct call setProxies on hc to avoid starting a health check process immediately, it should be done by Initial()
 	hc.setProxies(proxies)
+	hc.name = name
 
 	ip := &inlineProvider{
 		baseProvider: baseProvider{
@@ -329,6 +332,7 @@ func NewCompatibleProvider(name string, proxies []C.Proxy, hc *HealthCheck) (*Co
 			healthCheck: hc,
 		},
 	}
+	hc.name = name
 
 	wrapper := &CompatibleProvider{pd}
 	runtime.SetFinalizer(wrapper, (*CompatibleProvider).Close)

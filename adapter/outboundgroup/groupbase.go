@@ -39,6 +39,8 @@ type GroupBase struct {
 	getProxiesMutex  sync.Mutex
 	providerVersions []uint32
 	providerProxies  []C.Proxy
+
+	diagSt diagState // for the diagnostic log
 }
 
 type GroupBaseOption struct {
@@ -270,9 +272,11 @@ func (gb *GroupBase) onDialFailed(adapterType C.AdapterType, err error, fn func(
 	if errors.Is(err, C.ErrNotSupport) {
 		return
 	}
+	gb.diagDialFailed()
 
 	go func() {
 		if strings.Contains(err.Error(), "connection refused") {
+			gb.diagMaxFailed("connection refused", 1)
 			fn()
 			return
 		}
@@ -293,6 +297,7 @@ func (gb *GroupBase) onDialFailed(adapterType C.AdapterType, err error, fn func(
 			log.Debugln("ProxyGroup: %s failed count: %d", gb.Name(), gb.failedTimes)
 			if gb.failedTimes >= gb.maxFailedTimes {
 				log.Warnln("because %s failed multiple times, activate health check", gb.Name())
+				gb.diagMaxFailed("failed multiple times", gb.failedTimes)
 				fn()
 			}
 		}

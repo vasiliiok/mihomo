@@ -7,6 +7,7 @@ import (
 
 	"github.com/metacubex/mihomo/adapter/outboundgroup"
 	"github.com/metacubex/mihomo/common/utils"
+	"github.com/metacubex/mihomo/component/diag"
 	"github.com/metacubex/mihomo/component/profile/cachefile"
 	C "github.com/metacubex/mihomo/constant"
 	"github.com/metacubex/mihomo/tunnel"
@@ -83,7 +84,9 @@ func getGroupDelay(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), time.Millisecond*time.Duration(timeout))
 	defer cancel()
 
+	diag.Log("api", "group-delay group=%q url=%s timeout=%dms (unfixes the group, tests every member)", proxy.Name(), url, timeout)
 	dm, err := group.URLTest(ctx, url, expectedStatus)
+	diag.Log("api", "group-delay group=%q done answered=%d err=%q", proxy.Name(), len(dm), diag.Err(err))
 	if err != nil {
 		render.Status(r, http.StatusGatewayTimeout)
 		render.JSON(w, r, newError(err.Error()))

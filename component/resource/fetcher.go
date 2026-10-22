@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/metacubex/mihomo/common/utils"
+	"github.com/metacubex/mihomo/component/diag"
 	"github.com/metacubex/mihomo/component/slowdown"
 	P "github.com/metacubex/mihomo/constant/provider"
 	"github.com/metacubex/mihomo/log"
@@ -237,15 +238,18 @@ func (f *Fetcher[V]) updateWithLog() {
 	_, same, err := f.Update()
 	if err != nil {
 		log.Errorln("[Provider] %s pull error: %s", f.Name(), err.Error())
+		diag.Log("fetch", "name=%q vehicle=%s result=error err=%q", f.Name(), f.VehicleType(), diag.Err(err))
 		return
 	}
 
 	if same {
 		log.Debugln("[Provider] %s's content doesn't change", f.Name())
+		diag.Log("fetch", "name=%q vehicle=%s result=same", f.Name(), f.VehicleType())
 		return
 	}
 
 	log.Infoln("[Provider] %s's content update", f.Name())
+	diag.Log("fetch", "name=%q vehicle=%s result=updated", f.Name(), f.VehicleType())
 	return
 }
 

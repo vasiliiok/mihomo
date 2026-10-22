@@ -32,6 +32,7 @@ func (f *Fallback) Now() string {
 func (f *Fallback) DialContext(ctx context.Context, metadata *C.Metadata) (C.Conn, error) {
 	proxy := f.findAliveProxy(true)
 	c, err := proxy.DialContext(ctx, metadata)
+	f.diagDialed(err)
 	if err == nil {
 		c.AppendToChains(f)
 	} else {
@@ -55,6 +56,7 @@ func (f *Fallback) DialContext(ctx context.Context, metadata *C.Metadata) (C.Con
 func (f *Fallback) ListenPacketContext(ctx context.Context, metadata *C.Metadata) (C.PacketConn, error) {
 	proxy := f.findAliveProxy(true)
 	pc, err := proxy.ListenPacketContext(ctx, metadata)
+	f.diagDialed(err)
 	if err == nil {
 		pc.AppendToChains(f)
 	}
@@ -107,12 +109,12 @@ func (f *Fallback) findAliveProxy(touch bool) C.Proxy {
 	for _, proxy := range proxies {
 		if len(f.selected) == 0 {
 			if proxy.AliveForTestUrl(f.testUrl) {
-				return proxy
+				return f.diagNote(proxy)
 			}
 		} else {
 			if proxy.Name() == f.selected {
 				if proxy.AliveForTestUrl(f.testUrl) {
-					return proxy
+					return f.diagNote(proxy)
 				} else {
 					f.selected = ""
 				}
@@ -120,7 +122,7 @@ func (f *Fallback) findAliveProxy(touch bool) C.Proxy {
 		}
 	}
 
-	return proxies[0]
+	return f.diagNote(proxies[0])
 }
 
 func (f *Fallback) Set(name string) error {

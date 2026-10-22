@@ -32,6 +32,7 @@ import (
 	C "github.com/metacubex/mihomo/constant"
 	P "github.com/metacubex/mihomo/constant/provider"
 	"github.com/metacubex/mihomo/dns"
+	"github.com/metacubex/mihomo/hub/diagreport"
 	"github.com/metacubex/mihomo/listener"
 	authStore "github.com/metacubex/mihomo/listener/auth"
 	LC "github.com/metacubex/mihomo/listener/config"
@@ -120,6 +121,7 @@ func ApplyConfig(cfg *config.Config, force bool) {
 	updateUpdater(cfg)
 
 	resolver.ResetConnection()
+	diagreport.ConfigApplied()
 }
 
 func initInnerTcp() {

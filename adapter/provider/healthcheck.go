@@ -27,6 +27,7 @@ type extraOption struct {
 }
 
 type HealthCheck struct {
+	name           string // provider name, for the diagnostic log
 	ctx            context.Context
 	ctxCancel      context.CancelFunc
 	url            string
@@ -45,14 +46,14 @@ type HealthCheck struct {
 
 func (hc *HealthCheck) process() {
 	ticker := time.NewTicker(hc.interval)
-	go hc.check()
+	go hc.checkFor("start")
 	for {
 		select {
 		case <-ticker.C:
 			lastTouch := hc.lastTouch.Load()
 			since := time.Since(lastTouch)
 			if !hc.lazy || since < hc.interval {
-				hc.check()
+				hc.checkFor("tick")
 			} else {
 				log.Debugln("Skip once health check because we are lazy")
 			}
@@ -84,9 +85,10 @@ func (hc *HealthCheck) recheck() {
 	stale := hc.checkedVersion != hc.proxiesVersion
 	hc.mu.Unlock()
 	if stale {
+		diagRecheck(hc)
 		hc.singleDo.Reset()
 	}
-	hc.check()
+	hc.checkFor("update")
 }
 
 func (hc *HealthCheck) registerHealthCheckTask(url string, expectedStatus utils.IntRanges[uint16], filter string, interval uint) {
@@ -145,39 +147,50 @@ func (hc *HealthCheck) touch() {
 }
 
 func (hc *HealthCheck) check() {
+	hc.checkFor("request")
+}
+
+// checkFor runs a health check; reason (start, tick, update, request) is for the diagnostic log.
+func (hc *HealthCheck) checkFor(reason string) {
 	if len(hc.currentProxies()) == 0 {
 		return
 	}
 
-	_, _, _ = hc.singleDo.Do(func() (struct{}, error) {
+	_, _, shared := hc.singleDo.Do(func() (struct{}, error) {
 		// test one consistent snapshot of the proxies and remember which one it was
 		hc.mu.Lock()
 		proxies := hc.proxies
 		hc.checkedVersion = hc.proxiesVersion
+		version := hc.proxiesVersion
 		hc.mu.Unlock()
 
 		id := utils.NewUUIDV4().String()
 		log.Debugln("Start New Health Checking {%s}", id)
+		round := newHCRound(hc, id, reason, proxies, version)
 		b := new(errgroup.Group)
 		b.SetLimit(10)
 
 		// execute default health check
 		option := &extraOption{filters: nil, expectedStatus: hc.expectedStatus}
-		hc.execute(b, proxies, hc.url, id, option)
+		hc.execute(b, proxies, hc.url, id, option, round)
 
 		// execute extra health check
 		if len(hc.extra) != 0 {
 			for url, option := range hc.extra {
-				hc.execute(b, proxies, url, id, option)
+				hc.execute(b, proxies, url, id, option, round)
 			}
 		}
 		_ = b.Wait()
+		round.finish()
 		log.Debugln("Finish A Health Checking {%s}", id)
 		return struct{}{}, nil
 	})
+	if shared {
+		diagSkippedCheck(hc, reason)
+	}
 }
 
-func (hc *HealthCheck) execute(b *errgroup.Group, proxies []C.Proxy, url, uid string, option *extraOption) {
+func (hc *HealthCheck) execute(b *errgroup.Group, proxies []C.Proxy, url, uid string, option *extraOption, round *hcRound) {
 	url = strings.TrimSpace(url)
 	if len(url) == 0 {
 		log.Debugln("Health Check has been skipped due to testUrl is empty, {%s}", uid)
@@ -211,7 +224,9 @@ func (hc *HealthCheck) execute(b *errgroup.Group, proxies []C.Proxy, url, uid st
 			ctx, cancel := context.WithTimeout(hc.ctx, hc.timeout)
 			defer cancel()
 			log.Debugln("Health Checking, proxy: %s, url: %s, id: {%s}", p.Name(), url, uid)
-			_, _ = p.URLTest(ctx, url, expectedStatus)
+			start := time.Now()
+			_, err := p.URLTest(ctx, url, expectedStatus)
+			round.node(url, p, err, time.Since(start))
 			log.Debugln("Health Checked, proxy: %s, url: %s, alive: %t, delay: %d ms uid: {%s}", p.Name(), url, p.AliveForTestUrl(url), p.LastDelayForTestUrl(url), uid)
 			return nil
 		})
