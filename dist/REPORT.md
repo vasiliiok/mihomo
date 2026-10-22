@@ -63,8 +63,9 @@ v2: url-test kept a recreated proxy whose last result was a failure
 
 * `go vet ./adapter/... ./common/singledo/... ./component/resource/...` — чисто;
 * `go test -race` тех же пакетов — ok; новые тесты `-race -count=50` — ok;
-* `SKIP_CONCURRENT_TEST=1 SKIP_INTEROP_TEST=1 go test ./...` и то же с `-tags with_gvisor`, как в CI —
-  116 пакетов ok, падений нет (сравнивать с чистым тегом не понадобилось);
+* `SKIP_CONCURRENT_TEST=1 SKIP_INTEROP_TEST=1 go test ./...` и то же с `-tags with_gvisor`, как в CI, —
+  и на v2, и на итоговом коммите `9d72bf65`: 116 пакетов ok в каждом прогоне, падений нет (сравнивать с
+  чистым тегом не понадобилось);
 * `gofmt -l` показывает только `component/memory/memory_freebsd*.go` — они такие и в теге, не трогал.
 
 ## 3. Ревью
