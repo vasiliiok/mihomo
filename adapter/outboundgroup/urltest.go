@@ -117,18 +117,18 @@ func (u *URLTest) fast(touch bool) C.Proxy {
 
 		fast := proxies[0]
 		minDelay := fast.LastDelayForTestUrl(u.testUrl)
-		fastNotExist := true
+		var current C.Proxy
 
-		for _, proxy := range proxies[1:] {
-			if u.fastNode != nil && proxy.Name() == u.fastNode.Name() {
-				fastNotExist = false
-				// A provider recreates its proxy objects whenever the fetched content
-				// changes, so the stored fastNode may be a stale object that no health
-				// check updates any more. Keep the name, but switch to the current object.
-				u.fastNode = proxy
+		for i, proxy := range proxies {
+			// A provider recreates its proxy objects whenever the fetched content
+			// changes, so the stored fastNode may be a stale object that no health
+			// check updates any more. Look it up by name to get the current object.
+			// The first proxy is included, otherwise tolerance never applies to it.
+			if current == nil && u.fastNode != nil && proxy.Name() == u.fastNode.Name() {
+				current = proxy
 			}
 
-			if !proxy.AliveForTestUrl(u.testUrl) {
+			if i == 0 || !proxy.AliveForTestUrl(u.testUrl) {
 				continue
 			}
 
@@ -137,11 +137,22 @@ func (u *URLTest) fast(touch bool) C.Proxy {
 				fast = proxy
 				minDelay = delay
 			}
-
 		}
+
 		// tolerance
-		if u.fastNode == nil || fastNotExist || !u.fastNode.AliveForTestUrl(u.testUrl) || u.fastNode.LastDelayForTestUrl(u.testUrl) > fast.LastDelayForTestUrl(u.testUrl)+u.tolerance {
+		switch {
+		case current == nil || !current.AliveForTestUrl(u.testUrl):
 			u.fastNode = fast
+		case !hasTestResult(current, u.testUrl):
+			// The selected proxy has just been recreated and has no result for testUrl
+			// yet (its delay reads as the maximum). Keep it until it is tested instead
+			// of jumping to whichever proxy happened to be tested first.
+			u.fastNode = current
+		case int(current.LastDelayForTestUrl(u.testUrl)) > int(minDelay)+int(u.tolerance):
+			// int, not uint16: a missing delay (0xffff) plus tolerance would wrap around
+			u.fastNode = fast
+		default:
+			u.fastNode = current
 		}
 		return u.fastNode, nil
 	})
@@ -150,6 +161,12 @@ func (u *URLTest) fast(touch bool) C.Proxy {
 	}
 
 	return elm
+}
+
+// hasTestResult reports whether proxy has been health checked against url.
+func hasTestResult(proxy C.Proxy, url string) bool {
+	_, ok := proxy.ExtraDelayHistories()[url]
+	return ok
 }
 
 // SupportUDP implements C.ProxyAdapter

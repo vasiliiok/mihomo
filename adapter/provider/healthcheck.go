@@ -33,6 +33,8 @@ type HealthCheck struct {
 	extra          map[string]*extraOption
 	mu             sync.Mutex
 	proxies        []C.Proxy
+	proxiesVersion uint64 // bumped by setProxies, guarded by mu
+	checkedVersion uint64 // proxiesVersion the latest check started with, guarded by mu
 	interval       time.Duration
 	lazy           bool
 	expectedStatus utils.IntRanges[uint16]
@@ -62,7 +64,29 @@ func (hc *HealthCheck) process() {
 }
 
 func (hc *HealthCheck) setProxies(proxies []C.Proxy) {
+	hc.mu.Lock()
+	defer hc.mu.Unlock()
 	hc.proxies = proxies
+	hc.proxiesVersion++
+}
+
+func (hc *HealthCheck) currentProxies() []C.Proxy {
+	hc.mu.Lock()
+	defer hc.mu.Unlock()
+	return hc.proxies
+}
+
+// recheck tests the current proxies right away. A check that is already running
+// keeps testing the proxies it started with, and check() would only join it, so
+// proxies set during that check would stay untested until the next interval.
+func (hc *HealthCheck) recheck() {
+	hc.mu.Lock()
+	stale := hc.checkedVersion != hc.proxiesVersion
+	hc.mu.Unlock()
+	if stale {
+		hc.singleDo.Reset()
+	}
+	hc.check()
 }
 
 func (hc *HealthCheck) registerHealthCheckTask(url string, expectedStatus utils.IntRanges[uint16], filter string, interval uint) {
@@ -121,11 +145,17 @@ func (hc *HealthCheck) touch() {
 }
 
 func (hc *HealthCheck) check() {
-	if len(hc.proxies) == 0 {
+	if len(hc.currentProxies()) == 0 {
 		return
 	}
 
 	_, _, _ = hc.singleDo.Do(func() (struct{}, error) {
+		// test one consistent snapshot of the proxies and remember which one it was
+		hc.mu.Lock()
+		proxies := hc.proxies
+		hc.checkedVersion = hc.proxiesVersion
+		hc.mu.Unlock()
+
 		id := utils.NewUUIDV4().String()
 		log.Debugln("Start New Health Checking {%s}", id)
 		b := new(errgroup.Group)
@@ -133,12 +163,12 @@ func (hc *HealthCheck) check() {
 
 		// execute default health check
 		option := &extraOption{filters: nil, expectedStatus: hc.expectedStatus}
-		hc.execute(b, hc.url, id, option)
+		hc.execute(b, proxies, hc.url, id, option)
 
 		// execute extra health check
 		if len(hc.extra) != 0 {
 			for url, option := range hc.extra {
-				hc.execute(b, url, id, option)
+				hc.execute(b, proxies, url, id, option)
 			}
 		}
 		_ = b.Wait()
@@ -147,7 +177,7 @@ func (hc *HealthCheck) check() {
 	})
 }
 
-func (hc *HealthCheck) execute(b *errgroup.Group, url, uid string, option *extraOption) {
+func (hc *HealthCheck) execute(b *errgroup.Group, proxies []C.Proxy, url, uid string, option *extraOption) {
 	url = strings.TrimSpace(url)
 	if len(url) == 0 {
 		log.Debugln("Health Check has been skipped due to testUrl is empty, {%s}", uid)
@@ -168,7 +198,7 @@ func (hc *HealthCheck) execute(b *errgroup.Group, url, uid string, option *extra
 		}
 	}
 
-	for _, proxy := range hc.proxies {
+	for _, proxy := range proxies {
 		// skip proxies that do not require health check
 		if filterReg != nil {
 			if match, _ := filterReg.MatchString(proxy.Name()); !match {
