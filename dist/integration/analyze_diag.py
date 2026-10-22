@@ -94,9 +94,8 @@ def main(paths):
     fetch = collections.Counter((f.get("name"), f.get("result")) for _, _, f, _ in by["fetch"])
     for (name, result), n in sorted(fetch.items()):
         print(f"  fetch {name}: {result} ×{n}")
-    for t, _, f, rest in by["provider-update"]:
-        tail = rest.split(" ", 4)[-1] if "added=" in rest else rest
-        print(f"  update {t:%m-%d %H:%M:%S} {f.get('provider')} v{f.get('version')} proxies={f.get('proxies')} {tail[:200]}")
+    for t, _, _, rest in by["provider-update"]:
+        print(f"  update {t:%m-%d %H:%M:%S} {rest[:240]}")
 
     print("\n== health check rounds (provider, reason: count, duration p50/p90/max ms, alive avg)")
     rounds = collections.defaultdict(list)

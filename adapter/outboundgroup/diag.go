@@ -161,12 +161,25 @@ func (u *URLTest) DiagStatus() string {
 	reason, refDelay, at := u.diagSt.reason, u.diagSt.refDelay, u.diagSt.at
 	u.diagSt.mu.Unlock()
 
+	decided := "-"
+	if !at.IsZero() {
+		decided = strconv.Itoa(int(time.Since(at).Seconds())) + "s"
+	}
 	nowDelay := int(now.LastDelayForTestUrl(u.testUrl))
 	extra := ""
 	if reason == "pending" && !hasTestResult(now, u.testUrl) {
 		extra = " pending_prev_delay=" + diag.Delay(refDelay)
 	}
-	if stale {
+	empty := now == u.EmptyFallback()
+	switch {
+	case empty:
+		// COMPATIBLE is DIRECT: traffic through the group bypasses the proxies
+		extra += " empty_fallback=true"
+		if best != nil {
+			diag.Warn("url-test %s hands out its empty fallback %q while %d of its proxies are alive (decided %s ago)",
+				u.Name(), now.Name(), alive, decided)
+		}
+	case stale:
 		extra += " stale_object=true"
 	}
 	bestName, delta := "", "-"
@@ -176,14 +189,10 @@ func (u *URLTest) DiagStatus() string {
 			d := nowDelay - bestDelay
 			delta = strconv.Itoa(d)
 			if d > int(u.tolerance) && u.selected == "" {
-				diag.Warn("url-test %s: %q is %d ms slower than %q (%d vs %d ms, tolerance %d)",
-					u.Name(), now.Name(), d, bestName, nowDelay, bestDelay, u.tolerance)
+				diag.Warn("url-test %s: %q is %d ms slower than %q (%d vs %d ms, tolerance %d, decided %s ago)",
+					u.Name(), now.Name(), d, bestName, nowDelay, bestDelay, u.tolerance, decided)
 			}
 		}
-	}
-	decided := "-"
-	if !at.IsZero() {
-		decided = strconv.Itoa(int(time.Since(at).Seconds())) + "s"
 	}
 	return fmt.Sprintf("url-test=%q now=%q delay=%s best=%q best_delay=%s delta=%s tol=%d alive=%d dead=%d untested=%d total=%d fixed=%q decided=%s reason=%s %s%s",
 		u.Name(), now.Name(), diag.Delay(uint16(nowDelay)), bestName, diag.Delay(uint16(bestDelay)), delta, u.tolerance,

@@ -118,6 +118,13 @@ func TestURLTestDiagMarksLoadedAndStale(t *testing.T) {
 	pd.update(nil) // provider not loaded yet: the group hands out its empty fallback
 	group := newTestURLTest(t, pd, 30)
 	require.Same(t, group.EmptyFallback(), group.fast(false))
+	require.Contains(t, group.DiagStatus(), "empty_fallback=true")
+	require.Empty(t, grep(lines(), " warn "), "no proxies at all: nothing to warn about")
+
+	// the proxies arrive while the empty fallback is still cached
+	pd.update(delayProxies(100, 50))
+	require.Contains(t, group.DiagStatus(), "empty_fallback=true")
+	require.Len(t, grep(lines(), " warn ", "hands out its empty fallback", "while 2 of its proxies are alive"), 1)
 
 	pd.update(delayProxies(100, 50))
 	group.fastSingle.Reset()
@@ -128,5 +135,5 @@ func TestURLTestDiagMarksLoadedAndStale(t *testing.T) {
 	pd.update(delayProxies(100, 10))
 	status := group.DiagStatus()
 	require.Contains(t, status, "stale_object=true")
-	require.Empty(t, grep(lines(), " warn "), "a cached replaced object must not raise a delta warning")
+	require.Empty(t, grep(lines(), " warn ", "slower than"), "a cached replaced object must not raise a delta warning")
 }
