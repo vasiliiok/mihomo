@@ -11,7 +11,9 @@
   Проверено: все тесты urltestfix3 проходят; новые тесты журнала (`component/diag`, `adapter/*/diag_test.go`)
   проходят, в том числе с `-race`; интеграционная матрица S1–S6 на новой сборке — с выключенным журналом
   результаты те же, что у urltestfix3 (до долей секунды), с включённым — тоже; каталог журнала без
-  переменной не создаётся. Итоги — `dist/integration/results/summary-v4*.json`.
+  переменной не создаётся. Итоги — `dist/integration/results/summary-v4*.json`. На итоговом коммите
+  `b3301b09`: `go vet` и `-race` чисто, полный `go test ./...` (с `with_gvisor` и без) — все 59 пакетов
+  с тестами ok в каждом прогоне (58 прежних + `component/diag`).
 * **Новая находка (поведение upstream, не исправлено, нужно решение):** `COMPATIBLE` — пустой запасной
   вариант группы по умолчанию — это **DIRECT**. При каждом запуске fallback-группы сразу проверяют своих
   участников, url-test в этот момент ещё без узлов (провайдер не загружен), отдаёт `COMPATIBLE` и кэширует
@@ -27,9 +29,9 @@
 
 ## 0. Коротко (urltestfix3)
 
-* Бинарник: `dist/mihomo-linux-amd64-v1-v1.19.33-urltestfix3.gz` (linux/amd64, GOAMD64=v1,
-  статический, Go 1.26.10 — тот же, что у официального v1.19.33). Контрольные суммы — в `dist/SHA256SUMS`
-  и в разделе 6.
+* Бинарник urltestfix3 заменён в `dist/` на urltestfix4 (раздел 6); сам urltestfix3 остался в истории git:
+  https://github.com/vasiliiok/mihomo/raw/cdd00b27af23ab7c5beb23c9697ee9351575980f/dist/mihomo-linux-amd64-v1-v1.19.33-urltestfix3.gz
+  (sha256 .gz `1cf85c7e…be1f1`, файла `5e5a7752…c735`).
 * Внутри — v1.19.33 и **три** коммита:
   1. `7b870437` fix(url-test): follow proxies recreated by provider updates — присланный коммит 1 (в проде);
   2. `4c533ed4` fix(url-test, health-check): keep recreated nodes and test them promptly — присланный коммит 2;
@@ -87,7 +89,7 @@ v2: url-test kept a recreated proxy whose last result was a failure
 * `go vet ./adapter/... ./common/singledo/... ./component/resource/...` — чисто;
 * `go test -race` тех же пакетов — ok; новые тесты `-race -count=50` — ok;
 * `SKIP_CONCURRENT_TEST=1 SKIP_INTEROP_TEST=1 go test ./...` и то же с `-tags with_gvisor`, как в CI, —
-  и на v2, и на итоговом коммите `9d72bf65`: 116 пакетов ok в каждом прогоне, падений нет (сравнивать с
+  и на v2, и на итоговом коммите `9d72bf65`: все 58 пакетов с тестами ok в каждом из двух прогонов, падений нет (сравнивать с
   чистым тегом не понадобилось);
 * `gofmt -l` показывает только `component/memory/memory_freebsd*.go` — они такие и в теге, не трогал.
 
@@ -266,30 +268,30 @@ URL, отличным от URL провайдера. По URL групп про�
 
 ## 5. Сборка
 
-Собрано из чистого клона на коммите `9d72bf65` (в worktree Go не ставит VCS-метку), флаги — как в
+Итоговая сборка urltestfix4 — из чистого клона на коммите `b3301b09` (в worktree Go не ставит VCS-метку), флаги — как в
 `.github/workflows/build.yml` тега (`BUILDTAG=-extldflags --static`, `CGO_ENABLED=0`, `-tags with_gvisor`,
 `-trimpath`, `-w -s -buildid=`):
 
 ```
 GOOS=linux GOARCH=amd64 GOAMD64=v1 CGO_ENABLED=0 GOTOOLCHAIN=go1.26.10 \
 go build -tags "with_gvisor" -trimpath -ldflags "-extldflags --static \
-  -X 'github.com/metacubex/mihomo/constant.Version=v1.19.33-urltestfix3' \
-  -X 'github.com/metacubex/mihomo/constant.BuildTime=Thu Oct 22 16:52:17 UTC 2026' -w -s -buildid=" \
-  -o mihomo-linux-amd64-v1-v1.19.33-urltestfix3 .
+  -X 'github.com/metacubex/mihomo/constant.Version=v1.19.33-urltestfix4' \
+  -X 'github.com/metacubex/mihomo/constant.BuildTime=Thu Oct 22 18:39:35 UTC 2026' -w -s -buildid=" \
+  -o mihomo-linux-amd64-v1-v1.19.33-urltestfix4 .
 ```
 
 Проверки:
 
 ```
-$ ./mihomo-linux-amd64-v1-v1.19.33-urltestfix3 -v
-Mihomo Meta v1.19.33-urltestfix3 linux amd64 with go1.26.10 Thu Oct 22 16:52:17 UTC 2026
+$ ./mihomo-linux-amd64-v1-v1.19.33-urltestfix4 -v
+Mihomo Meta v1.19.33-urltestfix4 linux amd64 with go1.26.10 Thu Oct 22 18:39:35 UTC 2026
 Use tags: with_gvisor
 
-$ file mihomo-linux-amd64-v1-v1.19.33-urltestfix3
+$ file mihomo-linux-amd64-v1-v1.19.33-urltestfix4
 ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, stripped
 
-$ go version -m mihomo-linux-amd64-v1-v1.19.33-urltestfix3   (без списка зависимостей)
-mihomo-linux-amd64-v1-v1.19.33-urltestfix3: go1.26.10
+$ go version -m mihomo-linux-amd64-v1-v1.19.33-urltestfix4   (без списка зависимостей)
+mihomo-linux-amd64-v1-v1.19.33-urltestfix4: go1.26.10
 	build	-buildmode=exe
 	build	-compiler=gc
 	build	-tags=with_gvisor
@@ -299,12 +301,12 @@ mihomo-linux-amd64-v1-v1.19.33-urltestfix3: go1.26.10
 	build	GOOS=linux
 	build	GOAMD64=v1
 	build	vcs=git
-	build	vcs.revision=9d72bf65320ffb852d5861242a8df2f3bb50552a
+	build	vcs.revision=b3301b098a3eeda0cf99351d2e96d04a8cc28f2f
 	build	vcs.modified=false
 ```
 
 Сборка воспроизводима: повторная полная пересборка (`go build -a`) того же коммита той же командой
-(BuildTime задан строкой выше) дала тот же sha256 `5e5a7752…c735` — любой может пересобрать и сверить.
+(BuildTime задан строкой выше) дала тот же sha256 — проверено и для urltestfix3, и для urltestfix4.
 
 Сравнение с официальным `mihomo-linux-amd64-v1-v1.19.33`: та же версия Go (go1.26.10), те же
 `-tags`, `CGO_ENABLED`, `GOAMD64`, `-trimpath`; строка `DefaultGODEBUG` совпадает полностью. Отличия:
@@ -317,15 +319,18 @@ mihomo-linux-amd64-v1-v1.19.33-urltestfix3: go1.26.10
 нельзя. Файл оставлен пустым, как в теге (0 байт). mihomo тогда использует системные сертификаты LXC
 (`x509.SystemCertPool()`) — в Debian это пакет `ca-certificates`. На практике: держать `ca-certificates` в
 контейнере установленным и обновлённым (`apt install ca-certificates`). Отсюда и разница в размере:
-.gz 22 787 834 байт против 22 893 964 у официального.
+.gz 22 818 048 байт (urltestfix4) против 22 893 964 у официального.
 
 `-t` на конфиге с группами из раздела 1 (`dist/integration/user-config/`, провайдер заменён локальным
 файлом с похожими именами узлов): `configuration file … test is successful` — и у этой сборки, и у
 официальной v1.19.33.
 
 Короткий запуск на том же конфиге (URL проверки заменён на локальный 204, узлы — локальные SOCKS5 из
-`sim.py`, правило `MATCH,NON-RU-FIRST`): три запроса через mixed-port — `HTTP 204` за 0,04–0,06 с;
-в логе ни одной строки `error`/`fatal`/`warning`; группы выбрали:
+`sim.py`, правило `MATCH,NON-RU-FIRST`), для urltestfix4 — с журналом и без: три запроса через
+mixed-port — `HTTP 204` за 0,04–0,06 с; ошибок в логе нет; без `MIHOMO_DIAG_DIR` каталог журнала не
+создаётся. С журналом на этих группах сразу видно окно после запуска: 4 из 5 url-test групп первые ~10 с
+отдают `COMPATIBLE` (DIRECT), fallback-группы считают их живыми (их проверка — 1 мс, напрямую).
+Группы выбрали:
 
 ```
 PROXY-NON-RU           now='🇫🇮 Финляндия ⚡⭐ LTE'   (40 мс — самый быстрый из 4)
@@ -340,39 +345,42 @@ NON-RU-FIRST → PROXY-NON-RU, RU-FIRST → PROXY-RU, YOUTUBE и GOOGLE → PROX
 
 ## 6. Установка
 
-Файл: `mihomo-linux-amd64-v1-v1.19.33-urltestfix3.gz`
+Файл: `mihomo-linux-amd64-v1-v1.19.33-urltestfix4.gz`
 
 ```
-sha256 (.gz):          1cf85c7ecd40203b715a4ba467ff826ddb598690342ac502e8ba6d0cdffbe1f1
-sha256 (распакованный): 5e5a7752a27d4153a49fd3c41d78eabedb4a0476eee7c4ec29409135942bc735
+sha256 (.gz):          fa236819657820eba176b33567db86069a0a194d4cadee67b507e77480fbb51a
+sha256 (распакованный): 665680d29a9119766d2e1b29bd43e8b7a77ff32d6a27ae48d1e77c856bb4bd37
 ```
 
 ```
 # на компьютере: скачать .gz, затем
-scp mihomo-linux-amd64-v1-v1.19.33-urltestfix3.gz root@10.0.9.1:/root/
+scp mihomo-linux-amd64-v1-v1.19.33-urltestfix4.gz root@10.0.9.1:/root/
 # на хосте Proxmox
-cd /root && gunzip -k mihomo-linux-amd64-v1-v1.19.33-urltestfix3.gz && sha256sum mihomo-linux-amd64-v1-v1.19.33-urltestfix3
-#   должно быть 5e5a7752a27d4153a49fd3c41d78eabedb4a0476eee7c4ec29409135942bc735
-pct push 101 /root/mihomo-linux-amd64-v1-v1.19.33-urltestfix3 /usr/local/bin/mihomo.new --perms 0755
+cd /root && gunzip -k mihomo-linux-amd64-v1-v1.19.33-urltestfix4.gz && sha256sum mihomo-linux-amd64-v1-v1.19.33-urltestfix4
+#   должно быть 665680d29a9119766d2e1b29bd43e8b7a77ff32d6a27ae48d1e77c856bb4bd37
+pct push 101 /root/mihomo-linux-amd64-v1-v1.19.33-urltestfix4 /usr/local/bin/mihomo.new --perms 0755
 pct enter 101
 # в контейнере
 /usr/local/bin/mihomo.new -v
 /usr/local/bin/mihomo.new -d /etc/mihomo -t
-cp -p /usr/local/bin/mihomo /usr/local/bin/mihomo.urltestfix1
+cp -p /usr/local/bin/mihomo /usr/local/bin/mihomo.prev
 mv -f /usr/local/bin/mihomo.new /usr/local/bin/mihomo
 systemctl restart mihomo && systemctl status mihomo --no-pager -n 20 && mihomo -v
 ```
 
-* Откат: `cp -p /usr/local/bin/mihomo.urltestfix1 /usr/local/bin/mihomo.tmp && mv -f /usr/local/bin/mihomo.tmp /usr/local/bin/mihomo && systemctl restart mihomo`
+* Откат: `cp -p /usr/local/bin/mihomo.prev /usr/local/bin/mihomo.tmp && mv -f /usr/local/bin/mihomo.tmp /usr/local/bin/mihomo && systemctl restart mihomo`
   (поверх работающего файла писать нельзя — Text file busy, поэтому копия + `mv`).
 * После перезапуска fallback-группы до 1 минуты могут стоять на запасных (окно после запуска, interval 60) — это нормально.
 * Кнопку обновления ядра в панели не нажимать: она поставит официальную сборку без правок.
-* Что смотреть в `mihomo-monitor` после установки: переключений url-test в :03 (минута после обновления
-  подписки) должно стать заметно меньше; Δ по-прежнему не должен превышать tolerance.
+* Диагностический журнал включается отдельно — `dist/DIAG.md`. Что смотреть: переключений url-test в :03
+  (минута после обновления подписки) должно стать заметно меньше; Δ не должен превышать tolerance.
 
 ## 7. Файлы
 
-* `dist/mihomo-linux-amd64-v1-v1.19.33-urltestfix3.gz`, `dist/SHA256SUMS` — сборка;
+* `dist/mihomo-linux-amd64-v1-v1.19.33-urltestfix4.gz`, `dist/SHA256SUMS` — сборка;
+* `dist/DIAG.md` — диагностический журнал: включение, команда сбора, формат; `dist/MAINTENANCE.md` — как
+  обновлять сборку на новые релизы upstream;
+* `dist/integration/analyze_diag.py` — сводка по присланному журналу (`python3 analyze_diag.py архив.tar.gz`);
 * `dist/integration/sim.py` — имитация узлов (SOCKS5 с управляемой задержкой/режимом) и цели 204;
 * `dist/integration/scenarios.py` — сценарии S1–S6; запуск: `python3 scenarios.py <mihomo> <метка> <каталог>`;
 * `dist/integration/results/` — итоговые `summary-*.json`, ход каждого прогона (`*.events.txt`),
