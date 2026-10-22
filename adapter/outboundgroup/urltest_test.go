@@ -174,3 +174,43 @@ func TestURLTestToleranceAppliesToFirstProxy(t *testing.T) {
 	require.Same(t, next[0], group.fast(false),
 		"tolerance was ignored because the selected node is the first one")
 }
+
+func TestURLTestLeavesProxyThatIsNeverTested(t *testing.T) {
+	node1 := newDelayProxy("node-1", false, 0)
+	node2 := newDelayProxy("node-2", false, 0)
+	pd := &fakeProxyProvider{}
+	pd.update([]C.Proxy{node1, node2})
+	group := newTestURLTest(t, pd, 80)
+
+	// Nothing is tested yet, so the group starts on the first proxy.
+	require.Same(t, node1, group.fast(false))
+
+	// node-2 gets tested, node-1 never does (for example, the provider tests
+	// testUrl only for proxies matching another group's filter). Such a node has
+	// no earlier result to go by and must not be kept forever.
+	node2.tested, node2.delay = true, 50
+	group.fastSingle.Reset()
+	require.Same(t, node2, group.fast(false),
+		"url-test stayed on a proxy that has never been tested")
+}
+
+func TestURLTestLeavesRecreatedProxyThatWasDead(t *testing.T) {
+	pd := &fakeProxyProvider{}
+	first := delayProxies(100, 50)
+	pd.update(first)
+	group := newTestURLTest(t, pd, 80)
+	require.Equal(t, "node-2", group.fast(false).Name())
+
+	// node-2 fails its health check, and the subscription is updated before the
+	// group picks again. The new node-2 is not tested yet, but its last result
+	// says it is dead.
+	first[1].(*fakeDelayProxy).alive = false
+	next := []C.Proxy{
+		newDelayProxy("node-1", true, 100),
+		newDelayProxy("node-2", false, 0),
+	}
+	pd.update(next)
+	group.fastSingle.Reset()
+	require.Same(t, next[0], group.fast(false),
+		"url-test kept a recreated proxy whose last result was a failure")
+}

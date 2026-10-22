@@ -140,21 +140,29 @@ func (u *URLTest) fast(touch bool) C.Proxy {
 		}
 
 		// tolerance
-		switch {
-		case current == nil || !current.AliveForTestUrl(u.testUrl):
+		if current == nil || !current.AliveForTestUrl(u.testUrl) {
 			u.fastNode = fast
-		case !hasTestResult(current, u.testUrl):
-			// The selected proxy has just been recreated and has no result for testUrl
-			// yet (its delay reads as the maximum). Keep it until it is tested instead
-			// of jumping to whichever proxy happened to be tested first.
-			u.fastNode = current
-		case int(current.LastDelayForTestUrl(u.testUrl)) > int(minDelay)+int(u.tolerance):
-			// int, not uint16: a missing delay (0xffff) plus tolerance would wrap around
-			u.fastNode = fast
-		default:
-			u.fastNode = current
+			return fast, nil
 		}
-		return u.fastNode, nil
+
+		// A recreated proxy has no result for testUrl until the health check reaches it,
+		// and its delay reads as the maximum meanwhile. Until then judge it by the last
+		// result of its previous object, instead of jumping to whichever proxy happens
+		// to be tested first.
+		judged := current
+		if !hasTestResult(current, u.testUrl) && hasTestResult(u.fastNode, u.testUrl) {
+			judged = u.fastNode
+		}
+
+		// int, not uint16: a missing delay (0xffff) plus tolerance would wrap around
+		if !judged.AliveForTestUrl(u.testUrl) || int(judged.LastDelayForTestUrl(u.testUrl)) > int(minDelay)+int(u.tolerance) {
+			u.fastNode = fast
+			return fast, nil
+		}
+
+		// keep the tested object as the reference until current gets its own result
+		u.fastNode = judged
+		return current, nil
 	})
 	if shared && touch { // a shared fastSingle.Do() may cause providers untouched, so we touch them again
 		u.Touch()
