@@ -99,8 +99,24 @@ ls -la /root/mihomo-diag-*.tar.gz
 | `warn` | Δ > tolerance | то, что mihomo-monitor писал как «ВНИМАНИЕ» |
 | `runtime` | раз в минуту | аптайм, горутины, память (heap/sys/RSS), число соединений, трафик всего |
 
-Пример (из локальной имитации):
+Пример (из локальной имитации, сценарий S5: старт, смерть узла, `max-failed-times`, fallback; по одной-две строки каждого вида, не по порядку времени; время там в UTC, в контейнере будет местное). Строки `status`/`warn` с `COMPATIBLE` — то самое окно после запуска, когда группа ходит напрямую:
 
 ```
-EXAMPLE
+2026-10-22T18:34:59.911Z start version=sim-v4b build="unknown time" go=go1.26.10 pid=8186 interval=5s
+2026-10-22T18:34:59.971Z config url-test="UT" url=http://127.0.0.1:18204/generate_204 expected="*" tolerance=50 max_failed=3 timeout=5000 providers=["sim"] members=3
+2026-10-22T18:34:59.971Z config provider="sim" vehicle=File hc_url=http://127.0.0.1:18204/generate_204 interval=30s timeout=2s lazy=false expected="204" extra=[] proxies=5
+2026-10-22T18:34:59.923Z provider-update provider="sim" version=1 proxies=5 initial
+2026-10-22T18:34:59.923Z hc-start provider="sim" round=8c50b834 reason=update proxies=5 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:35:00.047Z hc-node provider="sim" round=8c50b834 node="n2" ok=true delay=61 full=124
+2026-10-22T18:35:00.229Z hc-end provider="sim" round=8c50b834 reason=update tests=5 alive=5 dur=305
+2026-10-22T18:35:09.972Z status url-test="UT" now="n2" delay=61 best="n2" best_delay=61 delta=0 tol=50 alive=3 dead=0 untested=0 total=3 fixed="" decided=0s reason=loaded dial_ok=1 dial_fail=0
+2026-10-22T18:35:09.971Z status fallback="FB" now="UT" chain="UT → n2" leaf_delay=61 fixed="" members=["UT":1 "BK":1] dial_ok=0 dial_fail=0
+2026-10-22T18:35:04.973Z runtime uptime=5s goroutines=12 heap=3MiB sys=17MiB rss=44MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:35:04.973Z status fallback="FB" now="UT" chain="UT → COMPATIBLE" leaf_delay=- fixed="" members=["UT":1 "BK":1] dial_ok=0 dial_fail=0
+2026-10-22T18:35:04.973Z status url-test="UT" now="COMPATIBLE" delay=- best="n2" best_delay=61 delta=- tol=50 alive=3 dead=0 untested=0 total=3 fixed="" decided=5s reason=first dial_ok=1 dial_fail=0 empty_fallback=true
+2026-10-22T18:35:04.973Z warn url-test UT hands out its empty fallback "COMPATIBLE" while 3 of its proxies are alive (decided 5s ago)
+2026-10-22T18:35:09.924Z url-test group="UT" from="COMPATIBLE" to="n2" reason=loaded from_delay=- to_delay=61 best="n2" best_delay=61 tol=50
+2026-10-22T18:35:40.099Z url-test group="UT" from="n2" to="n3" reason=dead from_delay=- to_delay=101 best="n3" best_delay=101 tol=50
+2026-10-22T18:35:50.251Z max-failed group="UT" failures=3 window=5000ms failed multiple times: health check of the group's providers (0 more in the previous 10 s+ not logged)
+2026-10-22T18:35:24.972Z fallback group="FB" from="UT" to="BK" fixed="" members=["UT":dead "BK":81]
 ```

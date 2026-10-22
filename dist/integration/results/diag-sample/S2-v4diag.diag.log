@@ -1,0 +1,184 @@
+2026-10-22T18:27:37.519Z hc-start provider="FB" round=27100c43 reason=start proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:27:37.519Z url-test group="BK" from="" to="COMPATIBLE" reason=first from_delay=- to_delay=- best="COMPATIBLE" best_delay=- tol=50
+2026-10-22T18:27:37.520Z url-test group="UT" from="" to="COMPATIBLE" reason=first from_delay=- to_delay=- best="COMPATIBLE" best_delay=- tol=50
+2026-10-22T18:27:37.521Z hc-node provider="FB" round=27100c43 node="UT" ok=true delay=1 full=1
+2026-10-22T18:27:37.521Z hc-node provider="FB" round=27100c43 node="BK" ok=true delay=1 full=1
+2026-10-22T18:27:37.521Z hc-end provider="FB" round=27100c43 reason=start tests=2 alive=2 dur=1
+2026-10-22T18:27:37.521Z provider-update provider="sim" version=1 proxies=34 initial
+2026-10-22T18:27:37.521Z hc-recheck provider="sim" (proxies replaced since the last round started: new round)
+2026-10-22T18:27:37.521Z hc-start provider="sim" round=d34e3007 reason=update proxies=34 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:27:37.525Z start version=sim-v4 build="unknown time" go=go1.26.10 pid=5565 interval=5s
+2026-10-22T18:27:37.525Z config fallback="FB" url=http://127.0.0.1:18204/generate_204 expected="204" max_failed=3 timeout=5000 providers=["FB"] members=["UT" "BK"]
+2026-10-22T18:27:37.525Z config url-test="BK" url=http://127.0.0.1:18204/generate_204 expected="*" tolerance=50 max_failed=3 timeout=5000 providers=["sim"] members=1
+2026-10-22T18:27:37.525Z config url-test="UT" url=http://127.0.0.1:18204/generate_204 expected="*" tolerance=50 max_failed=3 timeout=5000 providers=["sim"] members=33
+2026-10-22T18:27:37.525Z config provider="FB" vehicle=Compatible hc_url=http://127.0.0.1:18204/generate_204 interval=10s timeout=5s lazy=false expected="204" extra=[] proxies=2
+2026-10-22T18:27:37.525Z config provider="default" vehicle=Compatible hc_url= interval=0s timeout=5s lazy=true expected="*" extra=[] proxies=5
+2026-10-22T18:27:37.525Z config provider="sim" vehicle=File hc_url=http://127.0.0.1:18204/generate_204 interval=1m30s timeout=5s lazy=false expected="204" extra=[] proxies=34
+2026-10-22T18:27:42.523Z hc-node provider="sim" round=d34e3007 node="h04" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:42.523Z hc-node provider="sim" round=d34e3007 node="h08" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:27:42.523Z hc-node provider="sim" round=d34e3007 node="h01" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:42.523Z hc-node provider="sim" round=d34e3007 node="h03" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:42.523Z hc-node provider="sim" round=d34e3007 node="h10" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:42.523Z hc-node provider="sim" round=d34e3007 node="h02" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:42.523Z hc-node provider="sim" round=d34e3007 node="h09" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:42.523Z hc-node provider="sim" round=d34e3007 node="h05" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:42.523Z hc-node provider="sim" round=d34e3007 node="h06" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:42.523Z hc-node provider="sim" round=d34e3007 node="h07" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:42.526Z fallback group="FB" from="" to="UT" fixed="" members=["UT":1 "BK":1]
+2026-10-22T18:27:42.526Z status fallback="FB" now="UT" chain="UT → COMPATIBLE" leaf_delay=- fixed="" members=["UT":1 "BK":1] dial_ok=0 dial_fail=0
+2026-10-22T18:27:42.526Z status url-test="BK" now="COMPATIBLE" delay=- best="" best_delay=- delta=- tol=50 alive=0 dead=0 untested=1 total=1 fixed="" decided=5s reason=first dial_ok=1 dial_fail=0
+2026-10-22T18:27:42.526Z status url-test="UT" now="COMPATIBLE" delay=- best="" best_delay=- delta=- tol=50 alive=0 dead=10 untested=23 total=33 fixed="" decided=5s reason=first dial_ok=1 dial_fail=0
+2026-10-22T18:27:42.526Z runtime uptime=5s goroutines=23 heap=2MiB sys=17MiB rss=44MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:27:47.520Z hc-start provider="FB" round=4d06833d reason=tick proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:27:47.520Z url-test group="BK" from="COMPATIBLE" to="b1" reason=removed from_delay=- to_delay=- best="b1" best_delay=- tol=50
+2026-10-22T18:27:47.521Z url-test group="UT" from="COMPATIBLE" to="h01" reason=removed from_delay=- to_delay=- best="h01" best_delay=- tol=50
+2026-10-22T18:27:47.524Z hc-node provider="sim" round=d34e3007 node="h19" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:27:47.524Z hc-node provider="sim" round=d34e3007 node="h20" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:27:47.524Z hc-node provider="sim" round=d34e3007 node="h11" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:27:47.524Z hc-node provider="sim" round=d34e3007 node="h12" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:27:47.524Z hc-node provider="sim" round=d34e3007 node="h13" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:27:47.524Z hc-node provider="sim" round=d34e3007 node="h18" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:27:47.524Z hc-node provider="sim" round=d34e3007 node="h14" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:27:47.524Z hc-node provider="sim" round=d34e3007 node="h16" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:27:47.524Z hc-node provider="sim" round=d34e3007 node="h17" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:27:47.524Z hc-node provider="sim" round=d34e3007 node="h15" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:47.526Z status fallback="FB" now="UT" chain="UT → h01" leaf_delay=- fixed="" members=["UT":1 "BK":1] dial_ok=0 dial_fail=0
+2026-10-22T18:27:47.526Z status url-test="BK" now="b1" delay=- best="" best_delay=- delta=- tol=50 alive=0 dead=0 untested=1 total=1 fixed="" decided=0s reason=removed dial_ok=1 dial_fail=0
+2026-10-22T18:27:47.526Z status url-test="UT" now="h01" delay=- best="" best_delay=- delta=- tol=50 alive=0 dead=20 untested=13 total=33 fixed="" decided=0s reason=removed dial_ok=0 dial_fail=0
+2026-10-22T18:27:47.526Z runtime uptime=10s goroutines=27 heap=3MiB sys=17MiB rss=44MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:27:47.725Z hc-node provider="FB" round=4d06833d node="BK" ok=true delay=101 full=204
+2026-10-22T18:27:52.521Z hc-node provider="FB" round=4d06833d node="UT" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:27:52.521Z hc-end provider="FB" round=4d06833d reason=tick tests=2 alive=1 dur=5001
+2026-10-22T18:27:52.525Z fallback group="FB" from="UT" to="BK" fixed="" members=["UT":dead "BK":101]
+2026-10-22T18:27:52.525Z status fallback="FB" now="BK" chain="BK → b1" leaf_delay=- fixed="" members=["UT":dead "BK":101] dial_ok=0 dial_fail=0
+2026-10-22T18:27:52.525Z status url-test="BK" now="b1" delay=- best="" best_delay=- delta=- tol=50 alive=0 dead=0 untested=1 total=1 fixed="" decided=5s reason=removed dial_ok=0 dial_fail=0
+2026-10-22T18:27:52.525Z hc-node provider="sim" round=d34e3007 node="h27" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:27:52.525Z status url-test="UT" now="h01" delay=- best="" best_delay=- delta=- tol=50 alive=0 dead=21 untested=12 total=33 fixed="" decided=5s reason=removed dial_ok=0 dial_fail=1
+2026-10-22T18:27:52.525Z hc-node provider="sim" round=d34e3007 node="h26" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:52.525Z hc-node provider="sim" round=d34e3007 node="h24" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:52.525Z hc-node provider="sim" round=d34e3007 node="h25" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:52.526Z hc-node provider="sim" round=d34e3007 node="h28" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:52.526Z hc-node provider="sim" round=d34e3007 node="h21" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:52.526Z hc-node provider="sim" round=d34e3007 node="h22" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:52.526Z hc-node provider="sim" round=d34e3007 node="h23" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:52.526Z hc-node provider="sim" round=d34e3007 node="h29" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:52.526Z hc-node provider="sim" round=d34e3007 node="h30" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:27:52.526Z runtime uptime=15s goroutines=17 heap=3MiB sys=17MiB rss=44MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:27:52.731Z hc-node provider="sim" round=d34e3007 node="b1" ok=true delay=101 full=204
+2026-10-22T18:27:52.770Z hc-node provider="sim" round=d34e3007 node="sel" ok=true delay=121 full=244
+2026-10-22T18:27:53.031Z hc-node provider="sim" round=d34e3007 node="m1" ok=true delay=252 full=505
+2026-10-22T18:27:53.131Z hc-node provider="sim" round=d34e3007 node="m2" ok=true delay=301 full=604
+2026-10-22T18:27:53.131Z hc-end provider="sim" round=d34e3007 reason=update tests=34 alive=4 dur=15609
+2026-10-22T18:27:57.520Z hc-start provider="FB" round=5b018c1a reason=tick proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:27:57.525Z status fallback="FB" now="BK" chain="BK → b1" leaf_delay=101 fixed="" members=["UT":dead "BK":101] dial_ok=0 dial_fail=0
+2026-10-22T18:27:57.525Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=0s reason=keep dial_ok=1 dial_fail=0
+2026-10-22T18:27:57.526Z url-test group="UT" from="h01" to="sel" reason=dead from_delay=- to_delay=121 best="sel" best_delay=121 tol=50
+2026-10-22T18:27:57.526Z status url-test="UT" now="sel" delay=121 best="sel" best_delay=121 delta=0 tol=50 alive=3 dead=30 untested=0 total=33 fixed="" decided=0s reason=dead dial_ok=0 dial_fail=0
+2026-10-22T18:27:57.526Z runtime uptime=20s goroutines=16 heap=4MiB sys=17MiB rss=45MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:27:57.725Z hc-node provider="FB" round=5b018c1a node="BK" ok=true delay=101 full=205
+2026-10-22T18:28:02.520Z hc-node provider="FB" round=5b018c1a node="UT" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:02.521Z hc-end provider="FB" round=5b018c1a reason=tick tests=2 alive=1 dur=5000
+2026-10-22T18:28:02.525Z status fallback="FB" now="BK" chain="BK → b1" leaf_delay=101 fixed="" members=["UT":dead "BK":101] dial_ok=0 dial_fail=0
+2026-10-22T18:28:02.525Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:28:02.525Z status url-test="UT" now="sel" delay=121 best="sel" best_delay=121 delta=0 tol=50 alive=3 dead=30 untested=0 total=33 fixed="" decided=4s reason=dead dial_ok=0 dial_fail=1
+2026-10-22T18:28:02.526Z runtime uptime=25s goroutines=12 heap=4MiB sys=17MiB rss=45MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:28:07.520Z hc-start provider="FB" round=0ff69f5a reason=tick proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:28:07.525Z status fallback="FB" now="BK" chain="BK → b1" leaf_delay=101 fixed="" members=["UT":dead "BK":101] dial_ok=0 dial_fail=0
+2026-10-22T18:28:07.525Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=9s reason=keep dial_ok=1 dial_fail=0
+2026-10-22T18:28:07.525Z status url-test="UT" now="sel" delay=121 best="sel" best_delay=121 delta=0 tol=50 alive=3 dead=30 untested=0 total=33 fixed="" decided=9s reason=dead dial_ok=1 dial_fail=0
+2026-10-22T18:28:07.526Z runtime uptime=30s goroutines=18 heap=5MiB sys=17MiB rss=45MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:28:07.727Z hc-node provider="FB" round=0ff69f5a node="BK" ok=true delay=101 full=207
+2026-10-22T18:28:07.767Z hc-node provider="FB" round=0ff69f5a node="UT" ok=true delay=121 full=247
+2026-10-22T18:28:07.767Z hc-end provider="FB" round=0ff69f5a reason=tick tests=2 alive=2 dur=247
+2026-10-22T18:28:07.891Z fallback group="FB" from="BK" to="UT" fixed="" members=["UT":121 "BK":101]
+2026-10-22T18:28:08.994Z provider-update provider="sim" version=2 proxies=34 (all recreated) added=0 removed=0 added:[] removed:[]
+2026-10-22T18:28:08.995Z fetch name="sim" vehicle=File result=updated
+2026-10-22T18:28:08.995Z hc-recheck provider="sim" (proxies replaced since the last round started: new round)
+2026-10-22T18:28:08.995Z hc-start provider="sim" round=dd966c0d reason=update proxies=34 version=2 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:28:12.525Z status fallback="FB" now="UT" chain="UT → sel" leaf_delay=121 fixed="" members=["UT":121 "BK":101] dial_ok=4 dial_fail=0
+2026-10-22T18:28:12.525Z status url-test="BK" now="b1" delay=101 best="" best_delay=- delta=- tol=50 alive=0 dead=0 untested=1 total=1 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:28:12.525Z status url-test="UT" now="sel" delay=121 best="" best_delay=- delta=- tol=50 alive=0 dead=0 untested=33 total=33 fixed="" decided=4s reason=keep dial_ok=4 dial_fail=0
+2026-10-22T18:28:12.526Z runtime uptime=35s goroutines=23 heap=6MiB sys=21MiB rss=48MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:28:13.996Z hc-node provider="sim" round=dd966c0d node="h01" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:13.996Z hc-node provider="sim" round=dd966c0d node="h10" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:28:13.996Z hc-node provider="sim" round=dd966c0d node="h04" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:13.996Z hc-node provider="sim" round=dd966c0d node="h03" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:13.996Z hc-node provider="sim" round=dd966c0d node="h05" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:28:13.996Z hc-node provider="sim" round=dd966c0d node="h08" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:28:13.996Z hc-node provider="sim" round=dd966c0d node="h07" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:28:13.997Z hc-node provider="sim" round=dd966c0d node="h09" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:28:13.996Z hc-node provider="sim" round=dd966c0d node="h06" ok=false delay=- full=4999 err="context deadline exceeded"
+2026-10-22T18:28:13.997Z hc-node provider="sim" round=dd966c0d node="h02" ok=false delay=- full=5002 err="context deadline exceeded"
+2026-10-22T18:28:17.520Z hc-start provider="FB" round=cd4af921 reason=tick proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:28:17.526Z status fallback="FB" now="UT" chain="UT → sel" leaf_delay=121 fixed="" members=["UT":121 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:28:17.526Z status url-test="BK" now="b1" delay=101 best="" best_delay=- delta=- tol=50 alive=0 dead=0 untested=1 total=1 fixed="" decided=9s reason=keep dial_ok=1 dial_fail=0
+2026-10-22T18:28:17.526Z status url-test="UT" now="sel" delay=121 best="" best_delay=- delta=- tol=50 alive=0 dead=10 untested=23 total=33 fixed="" decided=9s reason=keep dial_ok=6 dial_fail=0
+2026-10-22T18:28:17.526Z runtime uptime=40s goroutines=29 heap=2MiB sys=21MiB rss=49MiB gc=3 conns=0 up=0MiB down=0MiB
+2026-10-22T18:28:17.724Z hc-node provider="FB" round=cd4af921 node="BK" ok=true delay=101 full=204
+2026-10-22T18:28:17.765Z hc-node provider="FB" round=cd4af921 node="UT" ok=true delay=121 full=244
+2026-10-22T18:28:17.765Z hc-end provider="FB" round=cd4af921 reason=tick tests=2 alive=2 dur=245
+2026-10-22T18:28:17.950Z url-test group="UT" from="sel" to="sel" reason=pending from_delay=121 to_delay=- best="h01" best_delay=- tol=50
+2026-10-22T18:28:18.997Z hc-node provider="sim" round=dd966c0d node="h17" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:18.997Z hc-node provider="sim" round=dd966c0d node="h18" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:18.997Z hc-node provider="sim" round=dd966c0d node="h11" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:28:18.997Z hc-node provider="sim" round=dd966c0d node="h12" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:18.997Z hc-node provider="sim" round=dd966c0d node="h20" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:18.997Z hc-node provider="sim" round=dd966c0d node="h13" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:18.997Z hc-node provider="sim" round=dd966c0d node="h19" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:18.997Z hc-node provider="sim" round=dd966c0d node="h14" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:28:18.997Z hc-node provider="sim" round=dd966c0d node="h16" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:28:18.997Z hc-node provider="sim" round=dd966c0d node="h15" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:28:22.526Z status fallback="FB" now="UT" chain="UT → sel" leaf_delay=- fixed="" members=["UT":121 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:28:22.526Z url-test group="BK" from="b1" to="b1" reason=pending from_delay=101 to_delay=- best="b1" best_delay=- tol=50
+2026-10-22T18:28:22.526Z status url-test="BK" now="b1" delay=- best="" best_delay=- delta=- tol=50 alive=0 dead=0 untested=1 total=1 fixed="" decided=0s reason=pending dial_ok=0 dial_fail=0 pending_prev_delay=101
+2026-10-22T18:28:22.526Z status url-test="UT" now="sel" delay=- best="" best_delay=- delta=- tol=50 alive=0 dead=20 untested=13 total=33 fixed="" decided=4s reason=pending dial_ok=5 dial_fail=0 pending_prev_delay=121
+2026-10-22T18:28:22.526Z runtime uptime=45s goroutines=23 heap=4MiB sys=21MiB rss=50MiB gc=3 conns=0 up=0MiB down=0MiB
+2026-10-22T18:28:23.999Z hc-node provider="sim" round=dd966c0d node="h30" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:23.999Z hc-node provider="sim" round=dd966c0d node="h24" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:28:23.999Z hc-node provider="sim" round=dd966c0d node="h23" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:23.999Z hc-node provider="sim" round=dd966c0d node="h29" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:23.999Z hc-node provider="sim" round=dd966c0d node="h25" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:23.999Z hc-node provider="sim" round=dd966c0d node="h26" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:23.999Z hc-node provider="sim" round=dd966c0d node="h27" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:23.999Z hc-node provider="sim" round=dd966c0d node="h28" ok=false delay=- full=5000 err="context deadline exceeded"
+2026-10-22T18:28:23.999Z hc-node provider="sim" round=dd966c0d node="h22" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:28:23.999Z hc-node provider="sim" round=dd966c0d node="h21" ok=false delay=- full=5001 err="context deadline exceeded"
+2026-10-22T18:28:24.204Z hc-node provider="sim" round=dd966c0d node="b1" ok=true delay=101 full=204
+2026-10-22T18:28:24.243Z hc-node provider="sim" round=dd966c0d node="sel" ok=true delay=121 full=244
+2026-10-22T18:28:24.504Z hc-node provider="sim" round=dd966c0d node="m1" ok=true delay=251 full=504
+2026-10-22T18:28:24.604Z hc-node provider="sim" round=dd966c0d node="m2" ok=true delay=301 full=604
+2026-10-22T18:28:24.604Z hc-end provider="sim" round=dd966c0d reason=update tests=34 alive=4 dur=15609
+2026-10-22T18:28:27.520Z hc-start provider="FB" round=8c0899ee reason=tick proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:28:27.526Z status fallback="FB" now="UT" chain="UT → sel" leaf_delay=121 fixed="" members=["UT":121 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:28:27.526Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=4s reason=pending dial_ok=1 dial_fail=0
+2026-10-22T18:28:27.526Z status url-test="UT" now="sel" delay=121 best="sel" best_delay=121 delta=0 tol=50 alive=3 dead=30 untested=0 total=33 fixed="" decided=9s reason=pending dial_ok=6 dial_fail=0
+2026-10-22T18:28:27.526Z runtime uptime=50s goroutines=18 heap=5MiB sys=21MiB rss=50MiB gc=3 conns=0 up=0MiB down=0MiB
+2026-10-22T18:28:27.726Z hc-node provider="FB" round=8c0899ee node="BK" ok=true delay=101 full=205
+2026-10-22T18:28:27.767Z hc-node provider="FB" round=8c0899ee node="UT" ok=true delay=121 full=246
+2026-10-22T18:28:27.767Z hc-end provider="FB" round=8c0899ee reason=tick tests=2 alive=2 dur=246
+2026-10-22T18:28:28.075Z url-test group="UT" from="sel" to="sel" reason=keep from_delay=121 to_delay=121 best="sel" best_delay=121 tol=50
+2026-10-22T18:28:32.525Z status fallback="FB" now="UT" chain="UT → sel" leaf_delay=121 fixed="" members=["UT":121 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:28:32.525Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=9s reason=pending dial_ok=0 dial_fail=0
+2026-10-22T18:28:32.525Z status url-test="UT" now="sel" delay=121 best="sel" best_delay=121 delta=0 tol=50 alive=3 dead=30 untested=0 total=33 fixed="" decided=4s reason=keep dial_ok=5 dial_fail=0
+2026-10-22T18:28:32.527Z runtime uptime=55s goroutines=12 heap=6MiB sys=21MiB rss=50MiB gc=3 conns=0 up=0MiB down=0MiB
+2026-10-22T18:28:37.520Z hc-start provider="FB" round=64559c4a reason=tick proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:28:37.520Z url-test group="BK" from="b1" to="b1" reason=keep from_delay=101 to_delay=101 best="b1" best_delay=101 tol=50
+2026-10-22T18:28:37.526Z status fallback="FB" now="UT" chain="UT → sel" leaf_delay=121 fixed="" members=["UT":121 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:28:37.526Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=0s reason=keep dial_ok=1 dial_fail=0
+2026-10-22T18:28:37.526Z status url-test="UT" now="sel" delay=121 best="sel" best_delay=121 delta=0 tol=50 alive=3 dead=30 untested=0 total=33 fixed="" decided=9s reason=keep dial_ok=6 dial_fail=0
+2026-10-22T18:28:37.526Z runtime uptime=1m0s goroutines=18 heap=8MiB sys=21MiB rss=50MiB gc=3 conns=0 up=0MiB down=0MiB
+2026-10-22T18:28:37.725Z hc-node provider="FB" round=64559c4a node="BK" ok=true delay=101 full=204
+2026-10-22T18:28:37.765Z hc-node provider="FB" round=64559c4a node="UT" ok=true delay=121 full=244
+2026-10-22T18:28:37.765Z hc-end provider="FB" round=64559c4a reason=tick tests=2 alive=2 dur=245
+2026-10-22T18:28:42.526Z status fallback="FB" now="UT" chain="UT → sel" leaf_delay=121 fixed="" members=["UT":121 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:28:42.526Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=5s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:28:42.526Z status url-test="UT" now="sel" delay=121 best="sel" best_delay=121 delta=0 tol=50 alive=3 dead=30 untested=0 total=33 fixed="" decided=4s reason=keep dial_ok=5 dial_fail=0
+2026-10-22T18:28:42.526Z runtime uptime=1m5s goroutines=12 heap=9MiB sys=25MiB rss=51MiB gc=3 conns=0 up=0MiB down=0MiB
+2026-10-22T18:28:47.519Z hc-start provider="FB" round=bcd5ce76 reason=tick proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:28:47.526Z status fallback="FB" now="UT" chain="UT → sel" leaf_delay=121 fixed="" members=["UT":121 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:28:47.526Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=0s reason=keep dial_ok=1 dial_fail=0
+2026-10-22T18:28:47.526Z status url-test="UT" now="sel" delay=121 best="sel" best_delay=121 delta=0 tol=50 alive=3 dead=30 untested=0 total=33 fixed="" decided=9s reason=keep dial_ok=6 dial_fail=0
+2026-10-22T18:28:47.526Z runtime uptime=1m10s goroutines=18 heap=3MiB sys=25MiB rss=51MiB gc=4 conns=0 up=0MiB down=0MiB
+2026-10-22T18:28:47.725Z hc-node provider="FB" round=bcd5ce76 node="BK" ok=true delay=101 full=205
+2026-10-22T18:28:47.764Z hc-node provider="FB" round=bcd5ce76 node="UT" ok=true delay=121 full=244
+2026-10-22T18:28:47.764Z hc-end provider="FB" round=bcd5ce76 reason=tick tests=2 alive=2 dur=244

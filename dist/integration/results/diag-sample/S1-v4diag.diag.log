@@ -1,0 +1,121 @@
+2026-10-22T18:26:41.167Z hc-start provider="FB" round=e0a063a8 reason=start proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:26:41.168Z url-test group="BK" from="" to="COMPATIBLE" reason=first from_delay=- to_delay=- best="COMPATIBLE" best_delay=- tol=50
+2026-10-22T18:26:41.168Z url-test group="UT" from="" to="COMPATIBLE" reason=first from_delay=- to_delay=- best="COMPATIBLE" best_delay=- tol=50
+2026-10-22T18:26:41.168Z provider-update provider="sim" version=1 proxies=5 initial
+2026-10-22T18:26:41.168Z hc-recheck provider="sim" (proxies replaced since the last round started: new round)
+2026-10-22T18:26:41.168Z hc-start provider="sim" round=512cecb8 reason=update proxies=5 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:26:41.170Z hc-node provider="FB" round=e0a063a8 node="BK" ok=true delay=1 full=2
+2026-10-22T18:26:41.170Z hc-node provider="FB" round=e0a063a8 node="UT" ok=true delay=1 full=2
+2026-10-22T18:26:41.170Z hc-end provider="FB" round=e0a063a8 reason=start tests=2 alive=2 dur=2
+2026-10-22T18:26:41.174Z start version=sim-v4 build="unknown time" go=go1.26.10 pid=5262 interval=5s
+2026-10-22T18:26:41.174Z config fallback="FB" url=http://127.0.0.1:18204/generate_204 expected="204" max_failed=3 timeout=5000 providers=["FB"] members=["UT" "BK"]
+2026-10-22T18:26:41.174Z config url-test="BK" url=http://127.0.0.1:18204/generate_204 expected="*" tolerance=50 max_failed=3 timeout=5000 providers=["sim"] members=1
+2026-10-22T18:26:41.174Z config url-test="UT" url=http://127.0.0.1:18204/generate_204 expected="*" tolerance=50 max_failed=3 timeout=5000 providers=["sim"] members=4
+2026-10-22T18:26:41.174Z config provider="FB" vehicle=Compatible hc_url=http://127.0.0.1:18204/generate_204 interval=10s timeout=5s lazy=false expected="204" extra=[] proxies=2
+2026-10-22T18:26:41.174Z config provider="default" vehicle=Compatible hc_url= interval=0s timeout=5s lazy=true expected="*" extra=[] proxies=5
+2026-10-22T18:26:41.174Z config provider="sim" vehicle=File hc_url=http://127.0.0.1:18204/generate_204 interval=15s timeout=2s lazy=false expected="204" extra=[] proxies=5
+2026-10-22T18:26:41.253Z hc-node provider="sim" round=512cecb8 node="n3" ok=true delay=41 full=84
+2026-10-22T18:26:41.375Z hc-node provider="sim" round=512cecb8 node="b1" ok=true delay=101 full=206
+2026-10-22T18:26:41.474Z hc-node provider="sim" round=512cecb8 node="n2" ok=true delay=151 full=305
+2026-10-22T18:26:41.534Z hc-node provider="sim" round=512cecb8 node="n4" ok=true delay=181 full=364
+2026-10-22T18:26:41.574Z hc-node provider="sim" round=512cecb8 node="n1" ok=true delay=201 full=405
+2026-10-22T18:26:41.574Z hc-end provider="sim" round=512cecb8 reason=update tests=5 alive=5 dur=405
+2026-10-22T18:26:46.175Z fallback group="FB" from="" to="UT" fixed="" members=["UT":1 "BK":1]
+2026-10-22T18:26:46.175Z status fallback="FB" now="UT" chain="UT → COMPATIBLE" leaf_delay=- fixed="" members=["UT":1 "BK":1] dial_ok=0 dial_fail=0
+2026-10-22T18:26:46.175Z status url-test="BK" now="COMPATIBLE" delay=- best="b1" best_delay=101 delta=- tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=5s reason=first dial_ok=1 dial_fail=0
+2026-10-22T18:26:46.175Z status url-test="UT" now="COMPATIBLE" delay=- best="n3" best_delay=41 delta=- tol=50 alive=4 dead=0 untested=0 total=4 fixed="" decided=5s reason=first dial_ok=1 dial_fail=0
+2026-10-22T18:26:46.175Z runtime uptime=5s goroutines=12 heap=2MiB sys=17MiB rss=44MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:26:51.168Z hc-start provider="FB" round=6e42cbb8 reason=tick proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:26:51.168Z url-test group="BK" from="COMPATIBLE" to="b1" reason=removed from_delay=- to_delay=101 best="b1" best_delay=101 tol=50
+2026-10-22T18:26:51.168Z url-test group="UT" from="COMPATIBLE" to="n3" reason=removed from_delay=- to_delay=41 best="n3" best_delay=41 tol=50
+2026-10-22T18:26:51.175Z status fallback="FB" now="UT" chain="UT → n3" leaf_delay=41 fixed="" members=["UT":1 "BK":1] dial_ok=0 dial_fail=0
+2026-10-22T18:26:51.175Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=0s reason=removed dial_ok=1 dial_fail=0
+2026-10-22T18:26:51.175Z status url-test="UT" now="n3" delay=41 best="n3" best_delay=41 delta=0 tol=50 alive=4 dead=0 untested=0 total=4 fixed="" decided=0s reason=removed dial_ok=1 dial_fail=0
+2026-10-22T18:26:51.175Z runtime uptime=10s goroutines=18 heap=2MiB sys=17MiB rss=44MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:26:51.252Z hc-node provider="FB" round=6e42cbb8 node="UT" ok=true delay=41 full=84
+2026-10-22T18:26:51.372Z hc-node provider="FB" round=6e42cbb8 node="BK" ok=true delay=101 full=204
+2026-10-22T18:26:51.372Z hc-end provider="FB" round=6e42cbb8 reason=tick tests=2 alive=2 dur=204
+2026-10-22T18:26:51.445Z provider-update provider="sim" version=2 proxies=5 (all recreated) added=0 removed=0 added:[] removed:[]
+2026-10-22T18:26:51.445Z fetch name="sim" vehicle=File result=updated
+2026-10-22T18:26:51.445Z hc-recheck provider="sim" (proxies replaced since the last round started: new round)
+2026-10-22T18:26:51.445Z hc-start provider="sim" round=3f01e614 reason=update proxies=5 version=2 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:26:51.650Z hc-node provider="sim" round=3f01e614 node="b1" ok=true delay=101 full=204
+2026-10-22T18:26:51.750Z hc-node provider="sim" round=3f01e614 node="n2" ok=true delay=151 full=304
+2026-10-22T18:26:51.811Z hc-node provider="sim" round=3f01e614 node="n4" ok=true delay=182 full=365
+2026-10-22T18:26:51.849Z hc-node provider="sim" round=3f01e614 node="n1" ok=true delay=200 full=403
+2026-10-22T18:26:52.250Z hc-node provider="sim" round=3f01e614 node="n3" ok=true delay=401 full=804
+2026-10-22T18:26:52.251Z hc-end provider="sim" round=3f01e614 reason=update tests=5 alive=5 dur=805
+2026-10-22T18:26:56.169Z hc-start provider="sim" round=031dd94f reason=tick proxies=5 version=2 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:26:56.175Z status fallback="FB" now="UT" chain="UT → n3" leaf_delay=41 fixed="" members=["UT":41 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:26:56.175Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=5s reason=removed dial_ok=0 dial_fail=0
+2026-10-22T18:26:56.175Z status url-test="UT" now="n3" delay=41 best="n2" best_delay=151 delta=-110 tol=50 alive=4 dead=0 untested=0 total=4 fixed="" decided=5s reason=removed dial_ok=5 dial_fail=0
+2026-10-22T18:26:56.175Z runtime uptime=15s goroutines=27 heap=3MiB sys=17MiB rss=44MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:26:56.380Z hc-node provider="sim" round=031dd94f node="b1" ok=true delay=101 full=211
+2026-10-22T18:26:56.475Z hc-node provider="sim" round=031dd94f node="n2" ok=true delay=151 full=305
+2026-10-22T18:26:56.536Z hc-node provider="sim" round=031dd94f node="n4" ok=true delay=182 full=366
+2026-10-22T18:26:56.574Z hc-node provider="sim" round=031dd94f node="n1" ok=true delay=201 full=404
+2026-10-22T18:26:56.975Z hc-node provider="sim" round=031dd94f node="n3" ok=true delay=401 full=805
+2026-10-22T18:26:56.975Z hc-end provider="sim" round=031dd94f reason=tick tests=5 alive=5 dur=806
+2026-10-22T18:27:01.168Z hc-start provider="FB" round=f5056bf5 reason=tick proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:27:01.169Z url-test group="UT" from="n3" to="n2" reason=slower from_delay=401 to_delay=151 best="n2" best_delay=151 tol=50
+2026-10-22T18:27:01.174Z status fallback="FB" now="UT" chain="UT → n2" leaf_delay=151 fixed="" members=["UT":41 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:27:01.174Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=0s reason=keep dial_ok=1 dial_fail=0
+2026-10-22T18:27:01.174Z status url-test="UT" now="n2" delay=151 best="n2" best_delay=151 delta=0 tol=50 alive=4 dead=0 untested=0 total=4 fixed="" decided=0s reason=slower dial_ok=6 dial_fail=0
+2026-10-22T18:27:01.175Z runtime uptime=20s goroutines=18 heap=4MiB sys=17MiB rss=45MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:27:01.372Z hc-node provider="FB" round=f5056bf5 node="BK" ok=true delay=101 full=203
+2026-10-22T18:27:01.472Z hc-node provider="FB" round=f5056bf5 node="UT" ok=true delay=151 full=303
+2026-10-22T18:27:01.473Z hc-end provider="FB" round=f5056bf5 reason=tick tests=2 alive=2 dur=304
+2026-10-22T18:27:06.175Z status fallback="FB" now="UT" chain="UT → n2" leaf_delay=151 fixed="" members=["UT":151 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:27:06.175Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=5s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:27:06.175Z status url-test="UT" now="n2" delay=151 best="n2" best_delay=151 delta=0 tol=50 alive=4 dead=0 untested=0 total=4 fixed="" decided=5s reason=slower dial_ok=5 dial_fail=0
+2026-10-22T18:27:06.175Z runtime uptime=25s goroutines=12 heap=5MiB sys=21MiB rss=46MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:27:11.168Z hc-start provider="FB" round=44fb888a reason=tick proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:27:11.168Z hc-start provider="sim" round=b77c780a reason=tick proxies=5 version=2 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:27:11.175Z status fallback="FB" now="UT" chain="UT → n2" leaf_delay=151 fixed="" members=["UT":151 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:27:11.175Z status url-test="BK" now="b1" delay=101 best="b1" best_delay=101 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=0s reason=keep dial_ok=1 dial_fail=0
+2026-10-22T18:27:11.175Z status url-test="UT" now="n2" delay=151 best="n2" best_delay=151 delta=0 tol=50 alive=4 dead=0 untested=0 total=4 fixed="" decided=0s reason=keep dial_ok=6 dial_fail=0
+2026-10-22T18:27:11.175Z runtime uptime=30s goroutines=33 heap=6MiB sys=21MiB rss=46MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:27:11.375Z hc-node provider="FB" round=44fb888a node="BK" ok=true delay=100 full=207
+2026-10-22T18:27:11.375Z hc-node provider="sim" round=b77c780a node="b1" ok=true delay=100 full=206
+2026-10-22T18:27:11.477Z hc-node provider="sim" round=b77c780a node="n2" ok=true delay=151 full=308
+2026-10-22T18:27:11.477Z hc-node provider="FB" round=44fb888a node="UT" ok=true delay=151 full=308
+2026-10-22T18:27:11.477Z hc-end provider="FB" round=44fb888a reason=tick tests=2 alive=2 dur=308
+2026-10-22T18:27:11.536Z hc-node provider="sim" round=b77c780a node="n4" ok=true delay=181 full=367
+2026-10-22T18:27:11.575Z hc-node provider="sim" round=b77c780a node="n1" ok=true delay=200 full=406
+2026-10-22T18:27:11.977Z hc-node provider="sim" round=b77c780a node="n3" ok=true delay=401 full=808
+2026-10-22T18:27:11.977Z hc-end provider="sim" round=b77c780a reason=tick tests=5 alive=5 dur=808
+2026-10-22T18:27:16.174Z status fallback="FB" now="UT" chain="UT → n2" leaf_delay=151 fixed="" members=["UT":151 "BK":100] dial_ok=5 dial_fail=0
+2026-10-22T18:27:16.174Z status url-test="BK" now="b1" delay=100 best="b1" best_delay=100 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:27:16.174Z status url-test="UT" now="n2" delay=151 best="n2" best_delay=151 delta=0 tol=50 alive=4 dead=0 untested=0 total=4 fixed="" decided=4s reason=keep dial_ok=5 dial_fail=0
+2026-10-22T18:27:16.174Z runtime uptime=35s goroutines=12 heap=6MiB sys=21MiB rss=47MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:27:21.168Z hc-start provider="FB" round=640b4d65 reason=tick proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:27:21.174Z status fallback="FB" now="UT" chain="UT → n2" leaf_delay=151 fixed="" members=["UT":151 "BK":100] dial_ok=5 dial_fail=0
+2026-10-22T18:27:21.174Z status url-test="BK" now="b1" delay=100 best="b1" best_delay=100 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=9s reason=keep dial_ok=1 dial_fail=0
+2026-10-22T18:27:21.174Z status url-test="UT" now="n2" delay=151 best="n2" best_delay=151 delta=0 tol=50 alive=4 dead=0 untested=0 total=4 fixed="" decided=9s reason=keep dial_ok=6 dial_fail=0
+2026-10-22T18:27:21.174Z runtime uptime=40s goroutines=18 heap=7MiB sys=21MiB rss=48MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:27:21.373Z hc-node provider="FB" round=640b4d65 node="BK" ok=true delay=101 full=204
+2026-10-22T18:27:21.472Z hc-node provider="FB" round=640b4d65 node="UT" ok=true delay=151 full=304
+2026-10-22T18:27:21.473Z hc-end provider="FB" round=640b4d65 reason=tick tests=2 alive=2 dur=304
+2026-10-22T18:27:26.168Z hc-start provider="sim" round=5f50aed3 reason=tick proxies=5 version=2 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:27:26.175Z status fallback="FB" now="UT" chain="UT → n2" leaf_delay=151 fixed="" members=["UT":151 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:27:26.175Z status url-test="BK" now="b1" delay=100 best="b1" best_delay=100 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=0s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:27:26.175Z status url-test="UT" now="n2" delay=151 best="n2" best_delay=151 delta=0 tol=50 alive=4 dead=0 untested=0 total=4 fixed="" decided=4s reason=keep dial_ok=5 dial_fail=0
+2026-10-22T18:27:26.175Z runtime uptime=45s goroutines=27 heap=2MiB sys=21MiB rss=49MiB gc=3 conns=0 up=0MiB down=0MiB
+2026-10-22T18:27:26.373Z hc-node provider="sim" round=5f50aed3 node="b1" ok=true delay=100 full=204
+2026-10-22T18:27:26.475Z hc-node provider="sim" round=5f50aed3 node="n2" ok=true delay=151 full=305
+2026-10-22T18:27:26.534Z hc-node provider="sim" round=5f50aed3 node="n4" ok=true delay=181 full=365
+2026-10-22T18:27:26.574Z hc-node provider="sim" round=5f50aed3 node="n1" ok=true delay=200 full=404
+2026-10-22T18:27:26.975Z hc-node provider="sim" round=5f50aed3 node="n3" ok=true delay=401 full=806
+2026-10-22T18:27:26.975Z hc-end provider="sim" round=5f50aed3 reason=tick tests=5 alive=5 dur=806
+2026-10-22T18:27:31.168Z hc-start provider="FB" round=ca02e541 reason=tick proxies=2 version=0 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-22T18:27:31.175Z status fallback="FB" now="UT" chain="UT → n2" leaf_delay=151 fixed="" members=["UT":151 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:27:31.175Z status url-test="BK" now="b1" delay=100 best="b1" best_delay=100 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=5s reason=keep dial_ok=1 dial_fail=0
+2026-10-22T18:27:31.175Z status url-test="UT" now="n2" delay=151 best="n2" best_delay=151 delta=0 tol=50 alive=4 dead=0 untested=0 total=4 fixed="" decided=9s reason=keep dial_ok=6 dial_fail=0
+2026-10-22T18:27:31.175Z runtime uptime=50s goroutines=18 heap=3MiB sys=21MiB rss=49MiB gc=3 conns=0 up=0MiB down=0MiB
+2026-10-22T18:27:31.373Z hc-node provider="FB" round=ca02e541 node="BK" ok=true delay=101 full=204
+2026-10-22T18:27:31.474Z hc-node provider="FB" round=ca02e541 node="UT" ok=true delay=152 full=305
+2026-10-22T18:27:31.474Z hc-end provider="FB" round=ca02e541 reason=tick tests=2 alive=2 dur=305
+2026-10-22T18:27:36.174Z status fallback="FB" now="UT" chain="UT → n2" leaf_delay=151 fixed="" members=["UT":152 "BK":101] dial_ok=5 dial_fail=0
+2026-10-22T18:27:36.174Z status url-test="BK" now="b1" delay=100 best="b1" best_delay=100 delta=0 tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=9s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:27:36.174Z status url-test="UT" now="n2" delay=151 best="n2" best_delay=151 delta=0 tol=50 alive=4 dead=0 untested=0 total=4 fixed="" decided=4s reason=keep dial_ok=5 dial_fail=0
+2026-10-22T18:27:36.174Z runtime uptime=55s goroutines=12 heap=3MiB sys=21MiB rss=49MiB gc=3 conns=0 up=0MiB down=0MiB

@@ -1,0 +1,63 @@
+2026-10-22T18:32:02.462Z provider-update provider="sim" version=1 proxies=4 initial
+2026-10-22T18:32:02.462Z hc-recheck provider="sim" (proxies replaced since the last round started: new round)
+2026-10-22T18:32:02.462Z hc-start provider="sim" round=6db07cc6 reason=update proxies=4 version=1 url=http://127.0.0.1:18204/generate_204 extra=["http://127.0.0.1:18204/other_204"]
+2026-10-22T18:32:02.468Z start version=sim-v4 build="unknown time" go=go1.26.10 pid=7405 interval=5s
+2026-10-22T18:32:02.468Z config url-test="ALL" url=http://127.0.0.1:18204/other_204 expected="*" tolerance=30 max_failed=5 timeout=5000 providers=["sim"] members=4
+2026-10-22T18:32:02.468Z config url-test="JP" url=http://127.0.0.1:18204/other_204 expected="*" tolerance=30 max_failed=5 timeout=5000 providers=["sim"] members=2
+2026-10-22T18:32:02.468Z config provider="default" vehicle=Compatible hc_url= interval=0s timeout=5s lazy=true expected="*" extra=[] proxies=4
+2026-10-22T18:32:02.468Z config provider="sim" vehicle=File hc_url=http://127.0.0.1:18204/generate_204 interval=10s timeout=2s lazy=false expected="204" extra=["http://127.0.0.1:18204/other_204 filter=^j"] proxies=4
+2026-10-22T18:32:02.485Z url-test group="ALL" from="" to="x1" reason=first from_delay=- to_delay=- best="x1" best_delay=- tol=30
+2026-10-22T18:32:02.486Z url-test group="JP" from="" to="j1" reason=first from_delay=- to_delay=- best="j1" best_delay=- tol=30
+2026-10-22T18:32:02.670Z hc-node provider="sim" round=6db07cc6 node="x1" ok=true delay=103 full=207
+2026-10-22T18:32:02.767Z hc-node provider="sim" round=6db07cc6 node="x2" ok=true delay=151 full=304
+2026-10-22T18:32:04.070Z hc-node provider="sim" round=6db07cc6 node="j1" ok=true delay=50 full=1607 url=http://127.0.0.1:18204/other_204
+2026-10-22T18:32:04.070Z hc-node provider="sim" round=6db07cc6 node="j1" ok=true delay=51 full=1607
+2026-10-22T18:32:04.130Z hc-node provider="sim" round=6db07cc6 node="j2" ok=true delay=81 full=1668 url=http://127.0.0.1:18204/other_204
+2026-10-22T18:32:04.131Z hc-node provider="sim" round=6db07cc6 node="j2" ok=true delay=81 full=1668
+2026-10-22T18:32:04.131Z hc-end provider="sim" round=6db07cc6 reason=update tests=6 alive=6 dur=1668
+2026-10-22T18:32:07.468Z status url-test="ALL" now="x1" delay=- best="j1" best_delay=50 delta=- tol=30 alive=2 dead=0 untested=2 total=4 fixed="" decided=4s reason=first dial_ok=0 dial_fail=0
+2026-10-22T18:32:07.469Z status url-test="JP" now="j1" delay=50 best="j1" best_delay=50 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=4s reason=first dial_ok=0 dial_fail=0
+2026-10-22T18:32:07.469Z runtime uptime=5s goroutines=11 heap=3MiB sys=17MiB rss=43MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:32:12.462Z hc-start provider="sim" round=47fb6130 reason=tick proxies=4 version=1 url=http://127.0.0.1:18204/generate_204 extra=["http://127.0.0.1:18204/other_204"]
+2026-10-22T18:32:12.469Z status url-test="ALL" now="x1" delay=- best="j1" best_delay=50 delta=- tol=30 alive=2 dead=0 untested=2 total=4 fixed="" decided=9s reason=first dial_ok=0 dial_fail=0
+2026-10-22T18:32:12.469Z status url-test="JP" now="j1" delay=50 best="j1" best_delay=50 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=9s reason=first dial_ok=0 dial_fail=0
+2026-10-22T18:32:12.469Z runtime uptime=10s goroutines=21 heap=4MiB sys=17MiB rss=44MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:32:12.556Z url-test group="ALL" from="x1" to="j1" reason=slower from_delay=- to_delay=50 best="j1" best_delay=50 tol=30
+2026-10-22T18:32:12.666Z hc-node provider="sim" round=47fb6130 node="x1" ok=true delay=100 full=203
+2026-10-22T18:32:12.768Z hc-node provider="sim" round=47fb6130 node="x2" ok=true delay=151 full=305
+2026-10-22T18:32:14.069Z hc-node provider="sim" round=47fb6130 node="j1" ok=true delay=50 full=1606 url=http://127.0.0.1:18204/other_204
+2026-10-22T18:32:14.069Z hc-node provider="sim" round=47fb6130 node="j1" ok=true delay=51 full=1606
+2026-10-22T18:32:14.130Z hc-node provider="sim" round=47fb6130 node="j2" ok=true delay=81 full=1668
+2026-10-22T18:32:14.130Z hc-node provider="sim" round=47fb6130 node="j2" ok=true delay=81 full=1667 url=http://127.0.0.1:18204/other_204
+2026-10-22T18:32:14.131Z hc-end provider="sim" round=47fb6130 reason=tick tests=6 alive=6 dur=1668
+2026-10-22T18:32:17.469Z status url-test="ALL" now="j1" delay=50 best="j1" best_delay=50 delta=0 tol=30 alive=2 dead=0 untested=2 total=4 fixed="" decided=4s reason=slower dial_ok=0 dial_fail=0
+2026-10-22T18:32:17.469Z status url-test="JP" now="j1" delay=50 best="j1" best_delay=50 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:32:17.469Z runtime uptime=15s goroutines=11 heap=5MiB sys=21MiB rss=46MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:32:22.462Z hc-start provider="sim" round=2ef483ca reason=tick proxies=4 version=1 url=http://127.0.0.1:18204/generate_204 extra=["http://127.0.0.1:18204/other_204"]
+2026-10-22T18:32:22.469Z status url-test="ALL" now="j1" delay=50 best="j1" best_delay=50 delta=0 tol=30 alive=2 dead=0 untested=2 total=4 fixed="" decided=9s reason=slower dial_ok=0 dial_fail=0
+2026-10-22T18:32:22.469Z status url-test="JP" now="j1" delay=50 best="j1" best_delay=50 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=9s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:32:22.469Z runtime uptime=20s goroutines=21 heap=6MiB sys=21MiB rss=47MiB gc=2 conns=0 up=0MiB down=0MiB
+2026-10-22T18:32:22.666Z hc-node provider="sim" round=2ef483ca node="x1" ok=true delay=101 full=203
+2026-10-22T18:32:22.768Z hc-node provider="sim" round=2ef483ca node="x2" ok=true delay=151 full=305
+2026-10-22T18:32:24.069Z hc-node provider="sim" round=2ef483ca node="j1" ok=true delay=51 full=1607 url=http://127.0.0.1:18204/other_204
+2026-10-22T18:32:24.070Z hc-node provider="sim" round=2ef483ca node="j1" ok=true delay=51 full=1607
+2026-10-22T18:32:24.131Z hc-node provider="sim" round=2ef483ca node="j2" ok=true delay=82 full=1668
+2026-10-22T18:32:24.131Z hc-node provider="sim" round=2ef483ca node="j2" ok=true delay=82 full=1668 url=http://127.0.0.1:18204/other_204
+2026-10-22T18:32:24.131Z hc-end provider="sim" round=2ef483ca reason=tick tests=6 alive=6 dur=1669
+2026-10-22T18:32:27.468Z status url-test="ALL" now="j1" delay=51 best="j1" best_delay=51 delta=0 tol=30 alive=2 dead=0 untested=2 total=4 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:32:27.468Z status url-test="JP" now="j1" delay=51 best="j1" best_delay=51 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:32:27.469Z runtime uptime=25s goroutines=11 heap=2MiB sys=21MiB rss=48MiB gc=3 conns=0 up=0MiB down=0MiB
+2026-10-22T18:32:32.461Z hc-start provider="sim" round=5a4796dc reason=tick proxies=4 version=1 url=http://127.0.0.1:18204/generate_204 extra=["http://127.0.0.1:18204/other_204"]
+2026-10-22T18:32:32.469Z status url-test="ALL" now="j1" delay=51 best="j1" best_delay=51 delta=0 tol=30 alive=2 dead=0 untested=2 total=4 fixed="" decided=9s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:32:32.469Z status url-test="JP" now="j1" delay=51 best="j1" best_delay=51 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=9s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:32:32.469Z runtime uptime=30s goroutines=21 heap=3MiB sys=21MiB rss=48MiB gc=3 conns=0 up=0MiB down=0MiB
+2026-10-22T18:32:32.667Z hc-node provider="sim" round=5a4796dc node="x1" ok=true delay=101 full=205
+2026-10-22T18:32:32.768Z hc-node provider="sim" round=5a4796dc node="x2" ok=true delay=151 full=306
+2026-10-22T18:32:34.070Z hc-node provider="sim" round=5a4796dc node="j1" ok=true delay=51 full=1607 url=http://127.0.0.1:18204/other_204
+2026-10-22T18:32:34.070Z hc-node provider="sim" round=5a4796dc node="j1" ok=true delay=51 full=1607
+2026-10-22T18:32:34.131Z hc-node provider="sim" round=5a4796dc node="j2" ok=true delay=83 full=1669
+2026-10-22T18:32:34.131Z hc-node provider="sim" round=5a4796dc node="j2" ok=true delay=83 full=1669 url=http://127.0.0.1:18204/other_204
+2026-10-22T18:32:34.131Z hc-end provider="sim" round=5a4796dc reason=tick tests=6 alive=6 dur=1669
+2026-10-22T18:32:37.468Z status url-test="ALL" now="j1" delay=51 best="j1" best_delay=51 delta=0 tol=30 alive=2 dead=0 untested=2 total=4 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:32:37.469Z status url-test="JP" now="j1" delay=51 best="j1" best_delay=51 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0
+2026-10-22T18:32:37.469Z runtime uptime=35s goroutines=11 heap=4MiB sys=21MiB rss=48MiB gc=3 conns=0 up=0MiB down=0MiB

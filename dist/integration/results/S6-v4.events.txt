@@ -1,0 +1,5 @@
+[   0.05s] mihomo started: {'meta': True, 'version': 'sim-v4'}
+[   0.05s] ALL.now = x1
+[   0.06s] JP.now = j1
+[  10.13s] ALL.now = j1
+RESULT {"changes": [[0.05, "ALL", "x1"], [0.06, "JP", "j1"], [10.13, "ALL", "j1"]], "final_ALL": "j1", "x1_tested_with_group_url": false, "j1_tested_with_group_url": true, "fixed": true}

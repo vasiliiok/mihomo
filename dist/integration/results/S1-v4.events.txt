@@ -1,0 +1,6 @@
+[   0.06s] mihomo started: {'meta': True, 'version': 'sim-v4'}
+[  10.17s] UT settled on n3 (40 ms); moving n3 to port 21003 (400 ms), old port 20003 keeps working
+[  10.17s] UT.now = n3
+[  20.07s] UT.now = n2
+[  22.24s] UT.now = n2
+RESULT {"final_UT": "n2", "old_port_conns_0_12s": 11, "old_port_conns_12_45s": 0, "UT_changes": [[10.17, "UT", "n3"], [20.07, "UT", "n2"], [22.24, "UT", "n2"]], "update_at": 10.17, "fixed": true}
