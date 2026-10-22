@@ -209,6 +209,9 @@ mihomo-linux-amd64-v1-v1.19.33-urltestfix3: go1.26.10
 	build	vcs.modified=false
 ```
 
+Сборка воспроизводима: повторная полная пересборка (`go build -a`) того же коммита той же командой
+(BuildTime задан строкой выше) дала тот же sha256 `5e5a7752…c735` — любой может пересобрать и сверить.
+
 Сравнение с официальным `mihomo-linux-amd64-v1-v1.19.33`: та же версия Go (go1.26.10), те же
 `-tags`, `CGO_ENABLED`, `GOAMD64`, `-trimpath`; строка `DefaultGODEBUG` совпадает полностью. Отличия:
 `vcs.revision` (наш коммит), `vcs.modified=false` (у официального `true` — из-за скопированного CA-bundle)
