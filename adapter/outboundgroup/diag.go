@@ -72,10 +72,12 @@ func (gb *GroupBase) diagProviders() string {
 }
 
 // diagUnavailable says why url-test cannot keep its node.
-func diagUnavailable(prev, current C.Proxy) string {
+func (u *URLTest) diagUnavailable(current C.Proxy) string {
 	switch {
-	case prev == nil:
+	case u.fastNode == nil:
 		return "first"
+	case u.fastNode == u.EmptyFallback():
+		return "loaded" // the providers had no proxies before
 	case current == nil:
 		return "removed"
 	default:
@@ -136,8 +138,12 @@ func (u *URLTest) DiagStatus() string {
 	var alive, dead, untested int
 	var best C.Proxy
 	bestDelay := 0xffff
+	stale := true // now is an object the provider has replaced (url-test caches its pick for 10 s)
 	proxies := u.GetProxies(false)
 	for _, p := range proxies {
+		if p == now {
+			stale = false
+		}
 		switch {
 		case !hasTestResult(p, u.testUrl):
 			untested++
@@ -160,10 +166,13 @@ func (u *URLTest) DiagStatus() string {
 	if reason == "pending" && !hasTestResult(now, u.testUrl) {
 		extra = " pending_prev_delay=" + diag.Delay(refDelay)
 	}
+	if stale {
+		extra += " stale_object=true"
+	}
 	bestName, delta := "", "-"
 	if best != nil {
 		bestName = best.Name()
-		if nowDelay < 0xffff {
+		if nowDelay < 0xffff && !stale {
 			d := nowDelay - bestDelay
 			delta = strconv.Itoa(d)
 			if d > int(u.tolerance) && u.selected == "" {

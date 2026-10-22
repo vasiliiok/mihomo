@@ -143,7 +143,7 @@ func (u *URLTest) fast(touch bool) C.Proxy {
 
 		// tolerance
 		if current == nil || !current.AliveForTestUrl(u.testUrl) {
-			reason := diagUnavailable(u.fastNode, current)
+			reason := u.diagUnavailable(current)
 			u.fastNode = fast
 			return u.diagPick(fast, reason, current, fast, minDelay), nil
 		}

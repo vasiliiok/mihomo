@@ -111,3 +111,22 @@ func TestFallbackDiagLogsSwitches(t *testing.T) {
 	require.Contains(t, got[1], `group="fb" from="a" to="b" fixed="" members=["a":dead "b":200]`)
 	require.Contains(t, fb.DiagStatus(), `fallback="fb" now="b" chain="b" leaf_delay=200`)
 }
+
+func TestURLTestDiagMarksLoadedAndStale(t *testing.T) {
+	lines := diagLines(t)
+	pd := &fakeProxyProvider{}
+	pd.update(nil) // provider not loaded yet: the group hands out its empty fallback
+	group := newTestURLTest(t, pd, 30)
+	require.Same(t, group.EmptyFallback(), group.fast(false))
+
+	pd.update(delayProxies(100, 50))
+	group.fastSingle.Reset()
+	require.Equal(t, "node-2", group.fast(false).Name())
+	require.Len(t, grep(lines(), " url-test ", `to="node-2" reason=loaded`), 1)
+
+	// the provider replaces its proxies while the pick is still cached
+	pd.update(delayProxies(100, 10))
+	status := group.DiagStatus()
+	require.Contains(t, status, "stale_object=true")
+	require.Empty(t, grep(lines(), " warn "), "a cached replaced object must not raise a delta warning")
+}

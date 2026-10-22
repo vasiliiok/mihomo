@@ -25,20 +25,29 @@ type configReporter interface {
 }
 
 var (
-	once    sync.Once
-	started = time.Now()
+	startOnce sync.Once
+	loopOnce  sync.Once
+	started   = time.Now()
 )
+
+// Starting logs the start of mihomo; called before the configuration is applied.
+func Starting() {
+	if !diag.Enabled() {
+		return
+	}
+	startOnce.Do(func() {
+		log.Infoln("[Diag] diagnostic log in %s, status every %s", diag.Dir(), diag.Interval())
+		diag.Log("start", "version=%s build=%q go=%s pid=%d interval=%s", C.Version, C.BuildTime, runtime.Version(), os.Getpid(), diag.Interval())
+	})
+}
 
 // ConfigApplied logs the applied configuration and starts the status lines.
 func ConfigApplied() {
 	if !diag.Enabled() {
 		return
 	}
-	once.Do(func() {
-		log.Infoln("[Diag] diagnostic log in %s, status every %s", diag.Dir(), diag.Interval())
-		diag.Log("start", "version=%s build=%q go=%s pid=%d interval=%s", C.Version, C.BuildTime, runtime.Version(), os.Getpid(), diag.Interval())
-		go loop()
-	})
+	Starting()
+	loopOnce.Do(func() { go loop() })
 	logConfig()
 }
 
