@@ -1,0 +1,15 @@
+### clean (3f27ef39) + final test files
+        	Messages:   	url-test returned a proxy object the provider has already replaced
+--- FAIL: TestURLTestFollowsRecreatedProviderProxies (0.00s)
+        	Messages:   	url-test left its node before any proxy was tested
+--- FAIL: TestURLTestKeepsRecreatedProxyUntilItIsTested (0.00s)
+        	Messages:   	tolerance was ignored because the selected node is the first one
+--- FAIL: TestURLTestToleranceAppliesToFirstProxy (0.00s)
+--- PASS: TestURLTestLeavesProxyThatIsNeverTested (0.00s)
+--- PASS: TestURLTestLeavesRecreatedProxyThatWasDead (0.00s)
+FAIL
+FAIL	github.com/metacubex/mihomo/adapter/outboundgroup	0.010s
+--- FAIL: TestHealthCheckTestsProxiesReplacedDuringACheck (3.00s)
+FAIL
+FAIL	github.com/metacubex/mihomo/adapter/provider	3.011s
+FAIL

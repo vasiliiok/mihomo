@@ -1,0 +1,5 @@
+[   0.05s] mihomo started: {'meta': True, 'version': 'sim-v3'}
+[  31.35s] UT on sel (120 ms), FB on UT; recreating all nodes (comment in the file)
+[  31.36s] UT.now = sel
+[  31.36s] FB.now = UT
+RESULT {"update_at": 31.36, "changes": [[31.36, "UT", "sel"], [31.36, "FB", "UT"]], "checks_after_update": [[36.46, "Health Checked, proxy: h01, url: http://127.0.0.1:18204/generate_204, alive: false, delay: 65535 ms uid: {3148bb42-5936-4828-9216-8ede5ca6b655}"], [46.71, "Health Checked, proxy: sel, url: http://127.0.0.1:18204/generate_204, alive: true, delay: 121 ms uid: {3148bb42-5936-4828-9216-8ede5ca6b655}"], [46.97, "Health Checked, proxy: m1, url: http://127.0.0.1:18204/generate_204, alive: true, delay: 252 ms uid: {3148bb42-5936-4828-9216-8ede5ca6b655}"]], "fixed": true}

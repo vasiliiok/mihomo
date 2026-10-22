@@ -1,0 +1,15 @@
+### go vet
+exit=0
+### go test -race (x1)
+?   	github.com/metacubex/mihomo/adapter	[no test files]
+?   	github.com/metacubex/mihomo/adapter/inbound	[no test files]
+ok  	github.com/metacubex/mihomo/adapter/outbound	1.077s
+ok  	github.com/metacubex/mihomo/adapter/outboundgroup	1.023s
+ok  	github.com/metacubex/mihomo/adapter/provider	1.036s
+ok  	github.com/metacubex/mihomo/common/singledo	1.117s
+?   	github.com/metacubex/mihomo/component/resource	[no test files]
+exit=0
+### go test -race new tests (x50)
+ok  	github.com/metacubex/mihomo/adapter/outboundgroup	1.086s
+ok  	github.com/metacubex/mihomo/adapter/provider	1.117s
+exit=0

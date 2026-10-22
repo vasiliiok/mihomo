@@ -1,0 +1,7 @@
+[   0.05s] mihomo started: {'meta': True, 'version': 'sim-c1'}
+[  10.96s] UT on n1 (first in list); n1 -> 110 ms, n2 -> 80 ms (better by 30 < tolerance 50)
+[  10.96s] UT.now = n1
+[  30.11s] UT.now = n2
+[  43.02s] n2 -> 40 ms (better by 70 > tolerance 50): every build must switch
+[  43.02s] UT.now = n2
+RESULT {"within_tolerance_final": "n2", "beyond_tolerance_final": "n2", "changes": [[10.96, "UT", "n1"], [30.11, "UT", "n2"], [43.02, "UT", "n2"]], "fixed": false}

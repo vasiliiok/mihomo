@@ -1,0 +1,5 @@
+[   0.05s] mihomo started: {'meta': True, 'version': 'sim-clean'}
+[   8.61s] startup check done: 51/51 tested
+[  10.61s] manual health check started (takes ~8 s: 51 nodes, 10 at a time, 1.5 s handshake)
+[  13.26s] provider reloaded in the middle of the check (log time 13.21s)
+RESULT {"update_at": 13.21, "new_objects_tested_timeline(s_after_update, count)": [[0.1, 0]], "first_new_tested_after_s": null, "all_new_tested_after_s": null, "health_check_starts": [0.03, 0.03, 10.03, 10.61, 20.03, 30.03, 40.03], "fixed": false}

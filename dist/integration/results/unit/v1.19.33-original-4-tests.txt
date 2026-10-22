@@ -1,0 +1,35 @@
+=== RUN   TestURLTestFollowsRecreatedProviderProxies
+    urltest_test.go:114: 
+        	Error Trace:	/tmp/claude-0/-home-user-mihomo/91a714f1-8ee1-515d-9623-cab3a58c40b5/scratchpad/wt-clean/adapter/outboundgroup/urltest_test.go:114
+        	Error:      	Not same: 
+        	            	expected: &outboundgroup.fakeDelayProxy{Proxy:(*adapter.Proxy)(0x92991477e40), name:"node-2", tested:true, alive:true, delay:0x32} (*outboundgroup.fakeDelayProxy)(0x929915ec660)
+        	            	actual  : &outboundgroup.fakeDelayProxy{Proxy:(*adapter.Proxy)(0x92991477b80), name:"node-2", tested:true, alive:true, delay:0x32} (*outboundgroup.fakeDelayProxy)(0x929915ec450)
+        	Test:       	TestURLTestFollowsRecreatedProviderProxies
+        	Messages:   	url-test returned a proxy object the provider has already replaced
+--- FAIL: TestURLTestFollowsRecreatedProviderProxies (0.00s)
+=== RUN   TestURLTestKeepsRecreatedProxyUntilItIsTested
+    urltest_test.go:142: 
+        	Error Trace:	/tmp/claude-0/-home-user-mihomo/91a714f1-8ee1-515d-9623-cab3a58c40b5/scratchpad/wt-clean/adapter/outboundgroup/urltest_test.go:142
+        	Error:      	Not same: 
+        	            	expected: &outboundgroup.fakeDelayProxy{Proxy:(*adapter.Proxy)(0x929915f6420), name:"node-2", tested:false, alive:true, delay:0x0} (*outboundgroup.fakeDelayProxy)(0x929915ecb70)
+        	            	actual  : &outboundgroup.fakeDelayProxy{Proxy:(*adapter.Proxy)(0x929915f6160), name:"node-2", tested:true, alive:true, delay:0x32} (*outboundgroup.fakeDelayProxy)(0x929915ec990)
+        	Test:       	TestURLTestKeepsRecreatedProxyUntilItIsTested
+        	Messages:   	url-test left its node before any proxy was tested
+--- FAIL: TestURLTestKeepsRecreatedProxyUntilItIsTested (0.00s)
+=== RUN   TestURLTestToleranceAppliesToFirstProxy
+    urltest_test.go:174: 
+        	Error Trace:	/tmp/claude-0/-home-user-mihomo/91a714f1-8ee1-515d-9623-cab3a58c40b5/scratchpad/wt-clean/adapter/outboundgroup/urltest_test.go:174
+        	Error:      	Not same: 
+        	            	expected: &outboundgroup.fakeDelayProxy{Proxy:(*adapter.Proxy)(0x929915f6790), name:"node-1", tested:true, alive:true, delay:0x64} (*outboundgroup.fakeDelayProxy)(0x929915ecf90)
+        	            	actual  : &outboundgroup.fakeDelayProxy{Proxy:(*adapter.Proxy)(0x929915f6840), name:"node-2", tested:true, alive:true, delay:0x3c} (*outboundgroup.fakeDelayProxy)(0x929915ecff0)
+        	Test:       	TestURLTestToleranceAppliesToFirstProxy
+        	Messages:   	tolerance was ignored because the selected node is the first one
+--- FAIL: TestURLTestToleranceAppliesToFirstProxy (0.00s)
+FAIL
+FAIL	github.com/metacubex/mihomo/adapter/outboundgroup	0.024s
+=== RUN   TestHealthCheckTestsProxiesReplacedDuringACheck
+    healthcheck_test.go:64: proxies set during a running health check were not tested
+--- FAIL: TestHealthCheckTestsProxiesReplacedDuringACheck (3.00s)
+FAIL
+FAIL	github.com/metacubex/mihomo/adapter/provider	3.012s
+FAIL

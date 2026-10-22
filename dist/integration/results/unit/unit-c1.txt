@@ -1,0 +1,14 @@
+### c1 (7b870437) + final test files
+--- PASS: TestURLTestFollowsRecreatedProviderProxies (0.00s)
+        	Messages:   	url-test left its node before any proxy was tested
+--- FAIL: TestURLTestKeepsRecreatedProxyUntilItIsTested (0.00s)
+        	Messages:   	tolerance was ignored because the selected node is the first one
+--- FAIL: TestURLTestToleranceAppliesToFirstProxy (0.00s)
+--- PASS: TestURLTestLeavesProxyThatIsNeverTested (0.00s)
+--- PASS: TestURLTestLeavesRecreatedProxyThatWasDead (0.00s)
+FAIL
+FAIL	github.com/metacubex/mihomo/adapter/outboundgroup	0.009s
+--- FAIL: TestHealthCheckTestsProxiesReplacedDuringACheck (3.00s)
+FAIL
+FAIL	github.com/metacubex/mihomo/adapter/provider	3.011s
+FAIL

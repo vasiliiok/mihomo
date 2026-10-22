@@ -1,0 +1,13 @@
+### v2 (4c533ed4) + final test files
+--- PASS: TestURLTestFollowsRecreatedProviderProxies (0.00s)
+--- PASS: TestURLTestKeepsRecreatedProxyUntilItIsTested (0.00s)
+--- PASS: TestURLTestToleranceAppliesToFirstProxy (0.00s)
+        	Messages:   	url-test stayed on a proxy that has never been tested
+--- FAIL: TestURLTestLeavesProxyThatIsNeverTested (0.00s)
+        	Messages:   	url-test kept a recreated proxy whose last result was a failure
+--- FAIL: TestURLTestLeavesRecreatedProxyThatWasDead (0.00s)
+FAIL
+FAIL	github.com/metacubex/mihomo/adapter/outboundgroup	0.010s
+--- PASS: TestHealthCheckTestsProxiesReplacedDuringACheck (0.00s)
+ok  	github.com/metacubex/mihomo/adapter/provider	0.010s
+FAIL

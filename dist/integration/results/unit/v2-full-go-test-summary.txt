@@ -1,0 +1,4 @@
+### go test ./... (SKIP_CONCURRENT_TEST=1 SKIP_INTEROP_TEST=1)
+exit=0
+### go test ./... -tags with_gvisor
+exit=0

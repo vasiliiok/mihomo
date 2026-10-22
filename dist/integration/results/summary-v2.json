@@ -1,0 +1,178 @@
+{
+ "S1": {
+  "final_UT": "n2",
+  "old_port_conns_0_12s": 10,
+  "old_port_conns_12_45s": 0,
+  "UT_changes": [
+   [
+    10.16,
+    "UT",
+    "n3"
+   ],
+   [
+    20.05,
+    "UT",
+    "n2"
+   ],
+   [
+    22.19,
+    "UT",
+    "n2"
+   ]
+  ],
+  "update_at": 10.16,
+  "fixed": true
+ },
+ "S2": {
+  "update_at": 21.28,
+  "changes": [
+   [
+    21.28,
+    "UT",
+    "sel"
+   ],
+   [
+    21.28,
+    "FB",
+    "UT"
+   ]
+  ],
+  "checks_after_update": [
+   [
+    26.38,
+    "Health Checked, proxy: h01, url: http://127.0.0.1:18204/generate_204, alive: false, delay: 65535 ms uid: {20996e76-361f-4a72-9eb0-81bf53429a39}"
+   ],
+   [
+    36.63,
+    "Health Checked, proxy: sel, url: http://127.0.0.1:18204/generate_204, alive: true, delay: 121 ms uid: {20996e76-361f-4a72-9eb0-81bf53429a39}"
+   ],
+   [
+    36.89,
+    "Health Checked, proxy: m1, url: http://127.0.0.1:18204/generate_204, alive: true, delay: 251 ms uid: {20996e76-361f-4a72-9eb0-81bf53429a39}"
+   ]
+  ],
+  "fixed": true
+ },
+ "S3": {
+  "within_tolerance_final": "n1",
+  "beyond_tolerance_final": "n2",
+  "changes": [
+   [
+    10.96,
+    "UT",
+    "n1"
+   ],
+   [
+    43.05,
+    "UT",
+    "n1"
+   ],
+   [
+    50.19,
+    "UT",
+    "n2"
+   ]
+  ],
+  "fixed": true
+ },
+ "S4": {
+  "update_at": 13.22,
+  "new_objects_tested_timeline(s_after_update, count)": [
+   [
+    0.1,
+    0
+   ],
+   [
+    2.1,
+    10
+   ],
+   [
+    3.6,
+    20
+   ],
+   [
+    5.1,
+    30
+   ],
+   [
+    6.6,
+    35
+   ],
+   [
+    7.1,
+    40
+   ],
+   [
+    8.6,
+    51
+   ]
+  ],
+  "first_new_tested_after_s": 2.1,
+  "all_new_tested_after_s": 8.6,
+  "health_check_starts": [
+   0.03,
+   0.03,
+   10.03,
+   10.62,
+   13.22,
+   20.03,
+   30.03,
+   40.03
+  ],
+  "fixed": true
+ },
+ "S5": {
+  "startup": [
+   [
+    0.06,
+    "UT",
+    "n1"
+   ],
+   [
+    0.06,
+    "BK",
+    "b1"
+   ],
+   [
+    0.06,
+    "FB",
+    "UT"
+   ],
+   [
+    10.09,
+    "UT",
+    "n2"
+   ]
+  ],
+  "A_left_dead_node_after_s": 28.1,
+  "A_UT": "n3",
+  "B_left_failing_node_after_s": 1.8,
+  "B_UT": "n1",
+  "B_max_failed_triggered": [
+   "because FB failed multiple times, activate health check",
+   "because UT failed multiple times, activate health check"
+  ],
+  "C_FB_to_BK_after_s": 13.1,
+  "C_FB_back_to_UT_after_s": 5.3,
+  "C_UT_after_revival": "n1",
+  "fixed": true
+ },
+ "S6": {
+  "changes": [
+   [
+    0.06,
+    "ALL",
+    "x1"
+   ],
+   [
+    0.06,
+    "JP",
+    "j1"
+   ]
+  ],
+  "final_ALL": "x1",
+  "x1_tested_with_group_url": false,
+  "j1_tested_with_group_url": true,
+  "fixed": false
+ }
+}

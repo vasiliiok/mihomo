@@ -1,0 +1,9 @@
+### v3 (working tree)
+--- PASS: TestURLTestFollowsRecreatedProviderProxies (0.00s)
+--- PASS: TestURLTestKeepsRecreatedProxyUntilItIsTested (0.00s)
+--- PASS: TestURLTestToleranceAppliesToFirstProxy (0.00s)
+--- PASS: TestURLTestLeavesProxyThatIsNeverTested (0.00s)
+--- PASS: TestURLTestLeavesRecreatedProxyThatWasDead (0.00s)
+ok  	github.com/metacubex/mihomo/adapter/outboundgroup	0.010s
+--- PASS: TestHealthCheckTestsProxiesReplacedDuringACheck (0.00s)
+ok  	github.com/metacubex/mihomo/adapter/provider	0.010s

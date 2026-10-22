@@ -1,0 +1,9 @@
+[   0.05s] mihomo started: {'meta': True, 'version': 'sim-clean'}
+[  21.45s] UT on sel (120 ms), FB on UT; recreating all nodes (comment in the file)
+[  21.46s] UT.now = sel
+[  21.46s] FB.now = UT
+[  30.18s] UT.now = h01
+[  38.59s] UT.now = sel
+[  42.57s] FB.now = BK
+[  50.36s] FB.now = UT
+RESULT {"update_at": 21.45, "changes": [[21.46, "UT", "sel"], [21.46, "FB", "UT"], [30.18, "UT", "h01"], [38.59, "UT", "sel"], [42.57, "FB", "BK"], [50.36, "FB", "UT"]], "checks_after_update": [[26.56, "Health Checked, proxy: h01, url: http://127.0.0.1:18204/generate_204, alive: false, delay: 65535 ms uid: {0b78ac8b-399a-43de-8c12-38ea3df04807}"], [36.81, "Health Checked, proxy: sel, url: http://127.0.0.1:18204/generate_204, alive: true, delay: 121 ms uid: {0b78ac8b-399a-43de-8c12-38ea3df04807}"], [37.06, "Health Checked, proxy: m1, url: http://127.0.0.1:18204/generate_204, alive: true, delay: 250 ms uid: {0b78ac8b-399a-43de-8c12-38ea3df04807}"], [43.55, "Health Checked, proxy: h01, url: http://127.0.0.1:18204/generate_204, alive: false, delay: 65535 ms uid: {8ef0fb31-e119-474a-814e-ea80b13c73fd}"], [53.8, "Health Checked, proxy: sel, url: http://127.0.0.1:18204/generate_204, alive: true, delay: 121 ms uid: {8ef0fb31-e119-474a-814e-ea80b13c73fd}"], [54.06, "Health Checked, proxy: m1, url: http://127.0.0.1:18204/generate_204, alive: true, delay: 251 ms uid: {8ef0fb31-e119-474a-814e-ea80b13c73fd}"]], "fixed": false}

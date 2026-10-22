@@ -1,0 +1,139 @@
+=== clean
+  S1/clean [   0.06s] mihomo started: {'meta': True, 'version': 'sim-clean'}
+  S1/clean [  10.16s] UT settled on n3 (40 ms); moving n3 to port 21003 (400 ms), old port 20003 keeps working
+  S1/clean [  10.17s] UT.now = n3
+  S1/clean [  22.20s] UT.now = n3
+  S2/clean [   0.05s] mihomo started: {'meta': True, 'version': 'sim-clean'}
+  S2/clean [  21.45s] UT on sel (120 ms), FB on UT; recreating all nodes (comment in the file)
+  S2/clean [  21.46s] UT.now = sel
+  S2/clean [  21.46s] FB.now = UT
+  S2/clean [  30.18s] UT.now = h01
+  S2/clean [  38.59s] UT.now = sel
+  S2/clean [  42.57s] FB.now = BK
+  S2/clean [  50.36s] FB.now = UT
+  S3/clean [   0.05s] mihomo started: {'meta': True, 'version': 'sim-clean'}
+  S3/clean [  10.98s] UT on n1 (first in list); n1 -> 110 ms, n2 -> 80 ms (better by 30 < tolerance 50)
+  S3/clean [  10.98s] UT.now = n1
+  S3/clean [  30.11s] UT.now = n2
+  S3/clean [  43.03s] n2 -> 40 ms (better by 70 > tolerance 50): every build must switch
+  S3/clean [  43.03s] UT.now = n2
+  S4/clean [   0.05s] mihomo started: {'meta': True, 'version': 'sim-clean'}
+  S4/clean [   8.61s] startup check done: 51/51 tested
+  S4/clean [  10.61s] manual health check started (takes ~8 s: 51 nodes, 10 at a time, 1.5 s handshake)
+  S4/clean [  13.26s] provider reloaded in the middle of the check (log time 13.21s)
+  S5/clean [   0.06s] mihomo started: {'meta': True, 'version': 'sim-clean'}
+  S5/clean [   0.06s] UT.now = COMPATIBLE
+  S5/clean [   0.06s] BK.now = COMPATIBLE
+  S5/clean [   0.06s] FB.now = UT
+  S5/clean [  10.11s] UT.now = n2
+  S5/clean [  10.11s] BK.now = b1
+  S5/clean [  12.08s] A: n2 (selected) now hangs; waiting for a scheduled check
+  S5/clean [  50.24s] B: n3 (selected) now closes connections; sending traffic
+  S5/clean [  52.05s] C: all UT nodes hang
+  S5/clean [  65.19s] C: UT nodes revived
+  S6/clean [   0.05s] mihomo started: {'meta': True, 'version': 'sim-clean'}
+  S6/clean [   0.05s] ALL.now = x1
+  S6/clean [   0.06s] JP.now = j1
+  S6/clean [  10.11s] ALL.now = j1
+=== c1
+  S1/c1 [   0.06s] mihomo started: {'meta': True, 'version': 'sim-c1'}
+  S1/c1 [  10.17s] UT settled on n3 (40 ms); moving n3 to port 21003 (400 ms), old port 20003 keeps working
+  S1/c1 [  10.18s] UT.now = n3
+  S1/c1 [  20.05s] UT.now = n2
+  S1/c1 [  22.18s] UT.now = n2
+  S2/c1 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-c1'}
+  S2/c1 [  31.35s] UT on sel (120 ms), FB on UT; recreating all nodes (comment in the file)
+  S2/c1 [  31.35s] UT.now = sel
+  S2/c1 [  31.35s] FB.now = UT
+  S2/c1 [  40.40s] UT.now = h01
+  S2/c1 [  47.45s] UT.now = sel
+  S3/c1 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-c1'}
+  S3/c1 [  10.96s] UT on n1 (first in list); n1 -> 110 ms, n2 -> 80 ms (better by 30 < tolerance 50)
+  S3/c1 [  10.96s] UT.now = n1
+  S3/c1 [  30.11s] UT.now = n2
+  S3/c1 [  43.02s] n2 -> 40 ms (better by 70 > tolerance 50): every build must switch
+  S3/c1 [  43.02s] UT.now = n2
+  S4/c1 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-c1'}
+  S4/c1 [   8.62s] startup check done: 51/51 tested
+  S4/c1 [  10.62s] manual health check started (takes ~8 s: 51 nodes, 10 at a time, 1.5 s handshake)
+  S4/c1 [  13.27s] provider reloaded in the middle of the check (log time 13.22s)
+  S5/c1 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-c1'}
+  S5/c1 [   0.06s] UT.now = n1
+  S5/c1 [   0.06s] BK.now = COMPATIBLE
+  S5/c1 [   0.06s] FB.now = UT
+  S5/c1 [  10.03s] UT.now = n2
+  S5/c1 [  10.03s] BK.now = b1
+  S5/c1 [  12.11s] A: n2 (selected) now hangs; waiting for a scheduled check
+  S5/c1 [  50.33s] B: n3 (selected) now closes connections; sending traffic
+  S5/c1 [  52.14s] C: all UT nodes hang
+  S5/c1 [  65.06s] C: UT nodes revived
+  S6/c1 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-c1'}
+  S6/c1 [   0.05s] ALL.now = x1
+  S6/c1 [   0.06s] JP.now = j1
+  S6/c1 [  10.14s] ALL.now = j1
+=== v2
+  S1/v2 [   0.06s] mihomo started: {'meta': True, 'version': 'sim-v2'}
+  S1/v2 [  10.15s] UT settled on n3 (40 ms); moving n3 to port 21003 (400 ms), old port 20003 keeps working
+  S1/v2 [  10.16s] UT.now = n3
+  S1/v2 [  20.05s] UT.now = n2
+  S1/v2 [  22.19s] UT.now = n2
+  S2/v2 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v2'}
+  S2/v2 [  21.28s] UT on sel (120 ms), FB on UT; recreating all nodes (comment in the file)
+  S2/v2 [  21.28s] UT.now = sel
+  S2/v2 [  21.28s] FB.now = UT
+  S3/v2 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v2'}
+  S3/v2 [  10.96s] UT on n1 (first in list); n1 -> 110 ms, n2 -> 80 ms (better by 30 < tolerance 50)
+  S3/v2 [  10.96s] UT.now = n1
+  S3/v2 [  43.05s] n2 -> 40 ms (better by 70 > tolerance 50): every build must switch
+  S3/v2 [  43.05s] UT.now = n1
+  S3/v2 [  50.19s] UT.now = n2
+  S4/v2 [   0.06s] mihomo started: {'meta': True, 'version': 'sim-v2'}
+  S4/v2 [   8.62s] startup check done: 51/51 tested
+  S4/v2 [  10.62s] manual health check started (takes ~8 s: 51 nodes, 10 at a time, 1.5 s handshake)
+  S4/v2 [  13.27s] provider reloaded in the middle of the check (log time 13.22s)
+  S5/v2 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v2'}
+  S5/v2 [   0.06s] UT.now = n1
+  S5/v2 [   0.06s] BK.now = b1
+  S5/v2 [   0.06s] FB.now = UT
+  S5/v2 [  10.09s] UT.now = n2
+  S5/v2 [  12.07s] A: n2 (selected) now hangs; waiting for a scheduled check
+  S5/v2 [  50.27s] B: n3 (selected) now closes connections; sending traffic
+  S5/v2 [  52.08s] C: all UT nodes hang
+  S5/v2 [  65.21s] C: UT nodes revived
+  S6/v2 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v2'}
+  S6/v2 [   0.06s] ALL.now = x1
+  S6/v2 [   0.06s] JP.now = j1
+=== v3
+  S1/v3 [   0.06s] mihomo started: {'meta': True, 'version': 'sim-v3'}
+  S1/v3 [  10.15s] UT settled on n3 (40 ms); moving n3 to port 21003 (400 ms), old port 20003 keeps working
+  S1/v3 [  10.16s] UT.now = n3
+  S1/v3 [  20.05s] UT.now = n2
+  S1/v3 [  22.22s] UT.now = n2
+  S2/v3 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v3'}
+  S2/v3 [  31.35s] UT on sel (120 ms), FB on UT; recreating all nodes (comment in the file)
+  S2/v3 [  31.36s] UT.now = sel
+  S2/v3 [  31.36s] FB.now = UT
+  S3/v3 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v3'}
+  S3/v3 [  10.96s] UT on n1 (first in list); n1 -> 110 ms, n2 -> 80 ms (better by 30 < tolerance 50)
+  S3/v3 [  10.96s] UT.now = n1
+  S3/v3 [  43.06s] n2 -> 40 ms (better by 70 > tolerance 50): every build must switch
+  S3/v3 [  43.06s] UT.now = n1
+  S3/v3 [  50.21s] UT.now = n2
+  S4/v3 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v3'}
+  S4/v3 [   8.61s] startup check done: 51/51 tested
+  S4/v3 [  10.61s] manual health check started (takes ~8 s: 51 nodes, 10 at a time, 1.5 s handshake)
+  S4/v3 [  13.27s] provider reloaded in the middle of the check (log time 13.22s)
+  S5/v3 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v3'}
+  S5/v3 [   0.05s] UT.now = COMPATIBLE
+  S5/v3 [   0.06s] BK.now = COMPATIBLE
+  S5/v3 [   0.06s] FB.now = UT
+  S5/v3 [  10.06s] UT.now = n2
+  S5/v3 [  10.06s] BK.now = b1
+  S5/v3 [  12.14s] A: n2 (selected) now hangs; waiting for a scheduled check
+  S5/v3 [  50.32s] B: n3 (selected) now closes connections; sending traffic
+  S5/v3 [  52.13s] C: all UT nodes hang
+  S5/v3 [  65.06s] C: UT nodes revived
+  S6/v3 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v3'}
+  S6/v3 [   0.05s] ALL.now = x1
+  S6/v3 [   0.06s] JP.now = j1
+  S6/v3 [  10.11s] ALL.now = j1
