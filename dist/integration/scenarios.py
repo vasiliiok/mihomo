@@ -43,8 +43,10 @@ def sim_stats():
     return json.loads(http("GET", f"http://127.0.0.1:{CONTROL}/stats"))
 
 
-def clean_env():
-    env = {k: v for k, v in os.environ.items() if "proxy" not in k.lower()}
+def clean_env(diag_dir=None):
+    env = {k: v for k, v in os.environ.items() if "proxy" not in k.lower() and not k.startswith("MIHOMO_DIAG")}
+    if diag_dir:  # SIM_DIAG=1: turn the diagnostic log on, status every 5 s
+        env.update(MIHOMO_DIAG_DIR=diag_dir, MIHOMO_DIAG_INTERVAL="5s")
     return env
 
 
@@ -104,8 +106,9 @@ rules:
             f.write(config)
         self.logfile = open(os.path.join(self.dir, "mihomo.log"), "w")
         self.t0 = time.time()
+        diag_dir = os.path.join(self.dir, "diag") if os.environ.get("SIM_DIAG") else None
         self.mihomo = subprocess.Popen([self.binary, "-d", self.dir], stdout=self.logfile, stderr=subprocess.STDOUT,
-                                       env=clean_env())
+                                       env=clean_env(diag_dir))
         for _ in range(100):
             try:
                 api("/version")
