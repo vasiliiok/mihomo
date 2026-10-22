@@ -17,6 +17,29 @@ health-check и провайдера.
 * Предупреждения (Δ больше tolerance) дублируются в обычный журнал mihomo строкой `[Diag] …` уровня warning
   — как «ВНИМАНИЕ» у mihomo-monitor.
 
+### Куда и как пишется (это не journald)
+
+* Обычный журнал mihomo идёт так: mihomo печатает строки в stdout, systemd забирает stdout службы и отдаёт
+  его journald — отсюда `journalctl -u mihomo`.
+* Диагностический журнал mihomo пишет **сам, в обычные текстовые файлы**, минуя stdout и journald: код
+  `component/diag` открывает `$MIHOMO_DIAG_DIR/diag-ГГГГ-ММ-ДД.log` в режиме дописывания и пишет каждую
+  строку сразу, без буфера (при падении теряется не больше строки, которая писалась в этот момент).
+  Каталог создаётся сам (если служба работает от root — обычно так — прав хватает).
+* Смена дня — по первой строке после полуночи (местное время контейнера; строки состояния идут раз в
+  минуту): вчерашний файл закрывается, начинается новый, а вчерашний в фоне сжимается в `.log.gz`;
+  заодно удаляются файлы старше 14 дней. Трогаются только файлы с именем `diag-ГГГГ-ММ-ДД.log[.gz]`.
+* В journald попадают только две вещи: строка `[Diag] diagnostic log in …` при запуске и предупреждения
+  (`[Diag] url-test … slower than …`, `… hands out its empty fallback …`) — чтобы их было видно в
+  `journalctl` и в панели, как «ВНИМАНИЕ» у monitor.
+* Почему не journald: у journald общий лимит места на всё (в том числе на журнал mihomo с соединениями
+  гостей) — при большом трафике он может вытеснить старые записи раньше двух суток, а в LXC может вообще
+  храниться только в памяти до перезагрузки; файлы от этого не зависят. Ещё — собрать их можно простым
+  копированием, не вытаскивая из journald чужие строки с данными гостей, и они не зависят от `log-level`.
+* Смотреть: сегодня — `tail -f /var/log/mihomo-diag/diag-$(date +%F).log`, прошлые дни —
+  `zless /var/log/mihomo-diag/diag-2026-10-23.log.gz`, поиск по всем — `zgrep 'url-test' /var/log/mihomo-diag/diag-*`.
+* Если писать некуда (нет прав, нет места), mihomo один раз пишет ошибку `[Diag] cannot write …` в
+  обычный журнал и работает дальше как обычно.
+
 Переменные:
 
 | переменная | по умолчанию | что |
@@ -59,7 +82,25 @@ rm -f /путь/к/скрипту/из/ExecStart
 systemctl daemon-reload && systemctl reset-failed
 ```
 
-## Собрать журнал за последние двое суток (на хосте Proxmox)
+## Собрать журнал за последние двое суток — внутри контейнера
+
+```
+D=/var/log/mihomo-diag
+OUT=/root/mihomo-diag-$(date +%Y%m%d-%H%M).tar.gz
+T=$(mktemp -d)
+cp $(ls -1 $D/diag-*.log* | tail -n 3) "$T"/
+journalctl -u mihomo --since "48 hours ago" -o short-iso --no-pager | grep -E 'systemd\[1\]|panic|fatal error|goroutine [0-9]+ \[' > "$T/journal-lifecycle.txt"
+/usr/local/bin/mihomo -v > "$T/version.txt" 2>&1
+tar -C "$T" -czf "$OUT" .
+rm -rf "$T"
+ls -la "$OUT"
+```
+
+Забрать архив: на хосте Proxmox `pct pull 101 /root/mihomo-diag-ГГГГММДД-ЧЧММ.tar.gz /root/mihomo-diag.tar.gz`,
+потом на компьютер `scp root@10.0.9.1:/root/mihomo-diag.tar.gz .` (или сразу `scp` из контейнера, если в
+нём есть SSH).
+
+## Собрать журнал за последние двое суток (на хосте Proxmox, то же одной командой)
 
 ```
 pct exec 101 -- sh -c '
