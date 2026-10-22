@@ -1,0 +1,8 @@
+proxies:
+  - {name: "🇳🇱 Нидерланды ⚡ LTE", type: socks5, server: 127.0.0.1, port: 20001, udp: false}
+  - {name: "🇩🇪 Германия ⭐ LTE", type: socks5, server: 127.0.0.1, port: 20002, udp: false}
+  - {name: "🇫🇮 Финляндия ⚡⭐ LTE", type: socks5, server: 127.0.0.1, port: 20003, udp: false}
+  - {name: "🇯🇵 Япония 🎮", type: socks5, server: 127.0.0.1, port: 20004, udp: false}
+  - {name: "🇷🇺 Россия LTE", type: socks5, server: 127.0.0.1, port: 20005, udp: false}
+  - {name: "🇷🇺 Россия 2", type: socks5, server: 127.0.0.1, port: 20006, udp: false}
+  - {name: "🇺🇸 США", type: socks5, server: 127.0.0.1, port: 20007, udp: false}

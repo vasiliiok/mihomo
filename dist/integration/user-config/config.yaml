@@ -1,0 +1,36 @@
+# Groups copied from the production config (section 1 of the task); the
+# subscription is replaced by a local file provider with similar node names.
+mixed-port: 17890
+external-controller: 127.0.0.1:19090
+log-level: info
+unified-delay: true
+ipv6: false
+mode: rule
+profile: {store-selected: false, store-fake-ip: false}
+
+proxy-providers:
+  quattro:
+    type: file
+    path: ./proxies/quattro.yaml
+    filter: '⚡|⭐|🎮|LTE|Россия'
+    health-check:
+      enable: true
+      url: "https://www.gstatic.com/generate_204"
+      expected-status: 204
+      interval: 300
+      timeout: 5000
+      lazy: false
+
+proxy-groups:
+  - {name: PROXY-NON-RU, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, max-failed-times: 3, include-all: true, exclude-filter: '🇷🇺', lazy: false}
+  - {name: PROXY-RU, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, max-failed-times: 3, include-all: true, filter: '🇷🇺', lazy: false}
+  - {name: PROXY-YOUTUBE, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, max-failed-times: 3, include-all: true, filter: '⚡', exclude-filter: '⭐', lazy: false}
+  - {name: PROXY-GEMINI, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, max-failed-times: 3, include-all: true, filter: '⭐', exclude-filter: '⚡', lazy: false}
+  - {name: PROXY-YOUTUBE-GEMINI, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, max-failed-times: 3, include-all: true, filter: '^(?=.*⚡)(?=.*⭐)', lazy: false}
+  - {name: NON-RU-FIRST, type: fallback, proxies: [PROXY-NON-RU, PROXY-RU], url: "https://www.gstatic.com/generate_204", expected-status: 204, interval: 60, max-failed-times: 3, lazy: false}
+  - {name: RU-FIRST, type: fallback, proxies: [PROXY-RU, PROXY-NON-RU], url: "https://www.gstatic.com/generate_204", expected-status: 204, interval: 60, max-failed-times: 3, lazy: false}
+  - {name: YOUTUBE, type: fallback, proxies: [PROXY-YOUTUBE-GEMINI, PROXY-YOUTUBE, PROXY-NON-RU], url: "https://www.gstatic.com/generate_204", expected-status: 204, interval: 60, max-failed-times: 3, lazy: false}
+  - {name: GOOGLE, type: fallback, proxies: [PROXY-YOUTUBE-GEMINI, PROXY-GEMINI, PROXY-NON-RU], url: "https://www.gstatic.com/generate_204", expected-status: 204, interval: 60, max-failed-times: 3, lazy: false}
+
+rules:
+  - MATCH,NON-RU-FIRST
