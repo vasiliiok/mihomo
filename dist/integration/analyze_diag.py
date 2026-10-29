@@ -144,8 +144,12 @@ def main(paths):
         fixed = {f.get("fixed") for _, f in rows if f.get("fixed")}
         alive = [int(f.get("alive", 0)) for _, f in rows]
         dials = sum(int(f.get("dial_ok", 0)) for _, f in rows), sum(int(f.get("dial_fail", 0)) for _, f in rows)
+        hcs = sum(int(f.get("hc_ok", 0)) for _, f in rows), sum(int(f.get("hc_fail", 0)) for _, f in rows)  # since urltestfix5
+        unreliable = [int(f["unreliable"]) for _, f in rows if f.get("unreliable", "").isdigit()]
         print(f"  {g}: {len(rows)} samples, Δ p50/p90/max {pct(deltas, .5)}/{pct(deltas, .9)}/{max(deltas) if deltas else '-'},"
-              f" Δ>tol {len(over)}×, alive min/avg {min(alive)}/{statistics.mean(alive):.0f}, dials ok/fail {dials[0]}/{dials[1]}"
+              f" Δ>tol {len(over)}×, alive min/avg {min(alive)}/{statistics.mean(alive):.0f}, dials ok/fail {dials[0]}/{dials[1]},"
+              f" fallback checks through it ok/fail {hcs[0]}/{hcs[1]}"
+              + (f", unreliable alive avg {statistics.mean(unreliable):.0f}" if unreliable else "")
               + (f", FIXED {fixed}" if fixed else ""))
 
     print("\n== fallback")
@@ -156,6 +160,15 @@ def main(paths):
         print(f"  {g}: {len(sw)} changes")
         for t, a, b in sw[:40]:
             print(f"    {t:%m-%d %H:%M:%S} {a!r} → {b!r}")
+
+    print("\n== fallback re-checks (fail-confirm)")
+    rc = collections.defaultdict(collections.Counter)
+    for _, _, f, _ in by["fallback-confirm"]:
+        rc[(f.get("group"), f.get("member"))][f.get("result")] += 1
+    for (g, m), c in sorted(rc.items()):
+        print(f"  {g} / {m}: alive ×{c['alive']}, dead ×{c['dead']}")
+    if not rc:
+        print("  none")
 
     print("\n== max-failed-times")
     mf = collections.Counter(f.get("group") for _, _, f, _ in by["max-failed"])
@@ -176,8 +189,10 @@ def main(paths):
     print("\n== runtime")
     rt = [(t, f) for t, _, f, _ in by["runtime"]]
     if rt:
-        for key in ("goroutines", "heap", "rss", "conns"):
-            vals = [int(re.sub(r"\D", "", f.get(key, "0")) or 0) for _, f in rt]
+        for key in ("goroutines", "heap", "alloc", "rss", "conns", "new_conns"):
+            vals = [int(re.sub(r"\D", "", f.get(key, "0")) or 0) for _, f in rt if key in f]
+            if not vals:  # alloc and new_conns: since urltestfix5
+                continue
             print(f"  {key}: first {vals[0]}, min {min(vals)}, max {max(vals)}, last {vals[-1]}")
     for t, _, _, rest in by["error"]:
         print(f"  ERROR {t:%m-%d %H:%M:%S} {rest[:200]}")

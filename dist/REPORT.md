@@ -1,6 +1,159 @@
-# mihomo v1.19.33-urltestfix4 — отчёт о проверке и сборке
+# mihomo v1.19.33-urltestfix5 — отчёт о проверке и сборке
 
-Дата: 22.10.2026. Ветка форка: `claude/brave-fermi-zen3ue` (`vasiliiok/mihomo`).
+Дата: 29.10.2026 (urltestfix4 — 22.10.2026). Ветка форка: `claude/brave-fermi-zen3ue` (`vasiliiok/mihomo`).
+Сборка, установка и строки для конфига — разделы 5 и 6.
+
+## urltestfix5: надёжность в url-test, подтверждение отказа в fallback, счётчики журнала (поверх urltestfix4)
+
+Основание — разбор недельного журнала из прода (22–29.10): п. 1 (fallback уходит с участника после одной
+неудачной проверки), п. 2 (url-test выбирает по одному последнему замеру) и п. 6 (недочёты счётчиков журнала).
+
+### Что изменилось
+
+| коммит | что | по умолчанию |
+|---|---|---|
+| `c8c4d5ed` fix(provider): keep the health check history of unchanged nodes on update | при обновлении подписки новый объект узла получает историю проверок старого, если у узла те же имя, тип и адрес | всегда |
+| `4897c063` feat(url-test): reliability and delay-samples options | параметры `reliability` и `delay-samples` | выключены |
+| `48e3610b` feat(fallback): fail-confirm option | параметр `fail-confirm` | выключен |
+| `01015d7f` fix(diag): count connections after the handshake, health checks apart | счётчики `dial_ok`/`dial_fail`, новые `hc_ok`/`hc_fail`, `alloc`, `new_conns` | — (только журнал) |
+| `b42c8782` fix: prevent SOCKS domain length arithmetic overflow (#3359) | перенесено из upstream (`6780eeeb`, ещё не в релизе): имя назначения длиной 254–255 байт в SOCKS/HTTP-запросе роняло весь процесс | всегда |
+
+Без новых параметров в конфиге выбор узлов такой же, как в urltestfix4. Единственное отличие — история
+проверок переживает обновление подписки. Официальная сборка неизвестные ключи групп молча игнорирует
+(проверено `-t`), так что конфиг с новыми параметрами остаётся совместимым при откате.
+
+### Как устроен параметр «надёжности» и почему так
+
+**Сначала — история.** В mihomo у каждого узла хранятся 10 последних проверок, но провайдер пересоздаёт все
+объекты узлов при каждом изменении подписки (у вас — почти каждый час). История обнулялась, и «надёжность за
+последние 10 проверок» всегда считалась бы по 1–2 проверкам. Поэтому первый коммит переносит историю на
+новый объект — если у узла те же имя, тип и адрес (`server:port`). Если адрес сменился, узел начинает с
+чистого листа. Если сменились только пароль или UUID (так было 23.10), история переносится, но новый
+список всё равно сразу целиком проверяется (правка №2), и провал станет виден через ~30 с.
+
+**Варианты, которые я сравнил.** Я прогнал неделю ваших проверок (2060 заходов, без двух аварий)
+через разные правила выбора и посчитал по пяти url-test-группам:
+
+* переключений в сутки (всего по пяти группам);
+* долю заходов, где следующая проверка выбранного узла провалилась;
+* долю времени на узлах, у которых за неделю меньше 90% успешных проверок.
+
+| правило | переключений/сут | провал следующей проверки (NON-RU / GEMINI) | время на ненадёжных (NON-RU / GEMINI / YT-GEMINI) |
+|---|---|---|---|
+| как сейчас: последний замер | 33,5 | 0,53% / 1,27% | 12,7% / 9,7% / 17,3% |
+| медиана 3 последних замеров | 10,1 | 0,53% / 0,58% | 2,7% / 3,0% / 4,5% |
+| только порог надёжности 90% | 29,9 | 0,39% / 0,44% | 10,4% / 4,7% / 13,2% |
+| **медиана 3 + надёжность 90%** | **9,2** | **0,39% / 0,39%** | **0,9% / 6,0% / 4,0%** |
+| медиана 5 + надёжность 90% | 7,4 | 0,39% / 0,39% | 2,7% / 3,7% / 0,0% |
+
+Средняя задержка выбранного узла почти не меняется: 81–86 мс против 83–85 мс.
+
+Что ещё я пробовал и почему отказался:
+
+* **Медиана из 5** (7,4 переключения в сутки): чуть меньше переключений, но задержка выбранного узла на
+  2–5 мс выше, а на настоящее замедление узла группа реагирует через 3 проверки вместо 2. При interval 300
+  это до 15 минут. Если переключения важнее скорости реакции, можно поставить `delay-samples: 5`.
+* **Порог 100%** («ни одного провала из 10»): 8,7 переключения, но в группах, где безупречных узлов мало,
+  правило вырождается в обычное. У GEMINI время на ненадёжных узлах 11,2% — хуже, чем без порога.
+* **Штраф в мс за каждую неудачную проверку** (100/200 мс): дал ровно те же цифры, что порог 100%. По сути
+  это то же исключение любого узла с провалом, но настраивать его труднее — штраф надо соотносить с
+  разбросом задержек и с tolerance.
+* **Порог 80%** и **«не было провалов в последних 3»**: 9,2–9,3 переключения, на ненадёжных узлах столько
+  же или больше времени, чем при 90%.
+
+**Итоговое правило** (`adapter/outboundgroup/urltest.go`, `rate`/`better`):
+
+* `delay-samples: K` — узлы сравниваются по медиане последних K **успешных** задержек (из 10 записей
+  истории). При чётном числе берётся бо́льшая из двух средних. Если успешных меньше K — медиана тех, что есть.
+* `reliability: N` — узел **надёжен**, если успешных проверок в его истории (до 10) не меньше N%. Для 90%
+  это «не больше одного провала из последних 10» (при interval 300 — примерно за 50 минут). Узел без
+  единой проверки надёжным не считается.
+* Порядок предпочтения: живой лучше мёртвого; надёжный лучше ненадёжного; дальше — меньшая задержка. Если
+  надёжных нет ни одного, выбирается самый быстрый живой — как раньше.
+* Группа уходит с текущего узла, если:
+  * он умер (последняя проверка провалена; это не изменилось);
+  * он стал ненадёжным, а надёжный есть (новая причина `unreliable` в журнале);
+  * он медленнее лучшего больше, чем на tolerance (по медианам).
+* Цена — реакция на **настоящее** ухудшение (узел стал медленным насовсем) приходит через 2 проверки вместо
+  1. При interval 300 это до 10 минут вместо 5. Смерть узла по-прежнему видна сразу.
+* Значения ограничены: `reliability` 0–100, `delay-samples` 0–10. 0 и 1 — выключено.
+
+### fail-confirm в fallback
+
+Из 356 неудачных проверок участников fallback за неделю (вне аварий) 303 (85%) — одиночные: следующая
+проверка проходила. С `fail-confirm: true` участник, у которого провалилась последняя проверка, остаётся
+в работе («под подозрением», `suspect` в журнале). Через 1 с после провала его проверяют ещё раз, тем же URL
+и тайм-аутом. Мёртвым он становится, только если провалится и эта повторная проверка, и до новой успешной.
+
+* Участник, общий для нескольких групп (у вас PROXY-YOUTUBE-GEMINI в YOUTUBE и GOOGLE), перепроверяется
+  один раз.
+* Выбранный вручную участник больше не сбрасывается одной неудачей.
+* Цена — при настоящей смерти участника fallback уходит на запасной позже: на 1 с + тайм-аут повторной
+  проверки (у вас ~6 с).
+
+### Журнал (п. 6)
+
+* `dial_ok`: для протоколов с отложенным рукопожатием (vless, vmess поверх websocket, TCP Fast Open и др.) соединение считается
+  успешным после первой записи, как это делает `max-failed-times`. Раньше оно считалось сразу после dial:
+  во время аварии 26.10 было «300 ok / 300 fail».
+* Проверки fallback-групп, идущие через url-test-группу, теперь в отдельных `hc_ok`/`hc_fail`; в
+  `dial_ok`/`dial_fail` — только клиенты.
+* В `runtime` добавлены `alloc` (сколько МиБ выделено за минуту) и `new_conns` (сколько соединений
+  открыто за минуту): они покажут, что происходит в минуту ежечасного всплеска памяти.
+* Новые поля и строки: `fallback-confirm`, причина `unreliable`, `ok`/`last`/`best_ok`/`unreliable` в
+  `status` url-test, `suspect` у участников fallback. Подробно — `dist/DIAG.md`.
+
+### Проверка
+
+**Модульные тесты** (все проходят, в том числе с `-race`):
+
+* история: `TestInheritHealth` (`adapter`), `TestProviderUpdateKeepsHistoryOfUnchangedNodes` (тот же адрес
+  — история перенесена; новый адрес или новый узел — с нуля);
+* url-test: `DelaySamplesIgnoreSingleSpike`, `PrefersReliableProxies`, `WithoutReliableProxiesPicksTheFastest`,
+  `ReliabilityDoesNotPreferUntested`, `ClampsRatingOptions`, `DiagLogsReliability`; шесть прежних тестов
+  url-test проходят без изменений — без новых параметров поведение прежнее;
+* fallback (`fallback_test.go`, новый файл): одиночный провал без `fail-confirm` уводит с участника, как
+  раньше; с `fail-confirm` — остаётся, повторная проверка через ~1 с; проваленная повторная — уходит и
+  больше не перепроверяет, пока узел не оживёт; общий участник двух групп перепроверяется один раз;
+  выбранный вручную участник не сбрасывается; строки журнала `fallback-confirm` и `suspect`;
+* журнал: соединение с отложенным рукопожатием до первой записи не считается, после неё — ok или fail;
+  проверки (контекст помечен `diag.MarkHealthCheck`) идут в `hc_ok`/`hc_fail`;
+* перенесённая правка SOCKS: `TestParseSocksAddrDomainLengths` на коде urltestfix4 падает с той же паникой
+  (`slice bounds out of range [2:0]`), с правкой проходит.
+
+**Полные прогоны** на коде urltestfix5:
+
+* `go vet ./...` чисто;
+* `go test ./...` без тегов — все 60 пакетов с тестами ok (59 прежних + `adapter`);
+* с `-tags with_gvisor` — все ok;
+* `-race` для `./adapter/... ./common/singledo/... ./component/... ./hub/... ./tunnel/...` — 18 пакетов с
+  тестами, все ok.
+
+`go test -race ./...` целиком упирается в 10-минутный лимит в `listener/inbound`: это тяжёлые тесты
+слушателей, нашего кода в них нет, без `-race` пакет проходит. После переноса правки SOCKS отдельно
+прогнаны `adapter/inbound` с `-race`, а также `./listener/... ./adapter/... ./tunnel/...` с `with_gvisor`
+— все ok, в том числе `listener/inbound` (143 с).
+
+**Интеграционные сценарии** на настоящих бинарниках (имитация узлов `sim.py`, новые S7–S9; в `sim.py`
+добавлены разовые и периодические сбои узла). v4 — urltestfix4, v5 — urltestfix5; в S7–S9 конфиг
+одинаковый, в нём новые параметры, и v4 их игнорирует:
+
+| сценарий | v4 | v5 |
+|---|---|---|
+| S1–S6 (регрессия правок urltestfix3) | все ok | все ok, те же числа до десятых секунды |
+| S7: один замер выбранного узла 340 мс вместо 40 (interval 12 с) | ушёл на узел 120 мс, потом вернулся | остался на месте |
+| S7: тот же узел стал 300 мс насовсем | ушёл через 10,1 с | через 14,1 с (с журналом 12,9 с) — на проверку позже |
+| S8: узел 30 мс проваливает каждую 3-ю проверку, рядом стабильный 90 мс | 100% времени на ненадёжном | после первого провала (20 с) — на стабильном до конца, одно переключение |
+| S9: три одиночных тайм-аута участника fallback (interval 3 с, timeout 1 с) | 3 ухода на запасной | 0 |
+| S9: участник умер насовсем | ушёл через 3,0 с | через 5,1 с (4,9 с) |
+| S9: участник ожил | вернулся через 2,0 с | через 3,0 с (3,3 с) |
+
+В S8 v4 не «мигал» только потому, что его 10-секундный кэш выбора ни разу не попал в 4-секундные окна,
+когда узел числился мёртвым. В проде (interval 300) такие окна длятся по 5 минут, и v4 туда-обратно ходит.
+С журналом (`SIM_DIAG=1`) v5 проходит все девять сценариев так же. В журнале видны:
+`fallback-confirm … result=alive after=1105ms`, затем `result=dead` и переход на запасной,
+`url-test … reason=slower … from_ok=6/6 … from_last=301`, `provider-update … 34 kept their history`.
+Итоги — `dist/integration/results/fix5/`.
 
 ## urltestfix4: диагностический журнал (поверх urltestfix3)
 
@@ -25,7 +178,7 @@
   `empty-fallback: REJECT` в группах (только конфиг) и/или маленькая правка — не кэшировать пустой запасной
   вариант. **Решение пользователя (22.10): оставить как есть.** Журнал продолжает это показывать.
 
-Ниже — отчёт по urltestfix3 (правки url-test и health-check); его выводы для urltestfix4 те же.
+Ниже — отчёт по urltestfix3 (правки url-test и health-check); его выводы для urltestfix4 и urltestfix5 те же.
 
 ## 0. Коротко (urltestfix3)
 
@@ -268,30 +421,30 @@ URL, отличным от URL провайдера. По URL групп про�
 
 ## 5. Сборка
 
-Итоговая сборка urltestfix4 — из чистого клона на коммите `b3301b09` (в worktree Go не ставит VCS-метку), флаги — как в
+Итоговая сборка urltestfix5 — из чистого клона на коммите `c19df995` (в worktree Go не ставит VCS-метку), флаги — как в
 `.github/workflows/build.yml` тега (`BUILDTAG=-extldflags --static`, `CGO_ENABLED=0`, `-tags with_gvisor`,
 `-trimpath`, `-w -s -buildid=`):
 
 ```
 GOOS=linux GOARCH=amd64 GOAMD64=v1 CGO_ENABLED=0 GOTOOLCHAIN=go1.26.10 \
 go build -tags "with_gvisor" -trimpath -ldflags "-extldflags --static \
-  -X 'github.com/metacubex/mihomo/constant.Version=v1.19.33-urltestfix4' \
-  -X 'github.com/metacubex/mihomo/constant.BuildTime=Thu Oct 22 18:39:35 UTC 2026' -w -s -buildid=" \
-  -o mihomo-linux-amd64-v1-v1.19.33-urltestfix4 .
+  -X 'github.com/metacubex/mihomo/constant.Version=v1.19.33-urltestfix5' \
+  -X 'github.com/metacubex/mihomo/constant.BuildTime=Thu Oct 29 13:31:08 UTC 2026' -w -s -buildid=" \
+  -o mihomo-linux-amd64-v1-v1.19.33-urltestfix5 .
 ```
 
 Проверки:
 
 ```
-$ ./mihomo-linux-amd64-v1-v1.19.33-urltestfix4 -v
-Mihomo Meta v1.19.33-urltestfix4 linux amd64 with go1.26.10 Thu Oct 22 18:39:35 UTC 2026
+$ ./mihomo-linux-amd64-v1-v1.19.33-urltestfix5 -v
+Mihomo Meta v1.19.33-urltestfix5 linux amd64 with go1.26.10 Thu Oct 29 13:31:08 UTC 2026
 Use tags: with_gvisor
 
-$ file mihomo-linux-amd64-v1-v1.19.33-urltestfix4
+$ file mihomo-linux-amd64-v1-v1.19.33-urltestfix5
 ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, stripped
 
-$ go version -m mihomo-linux-amd64-v1-v1.19.33-urltestfix4   (без списка зависимостей)
-mihomo-linux-amd64-v1-v1.19.33-urltestfix4: go1.26.10
+$ go version -m mihomo-linux-amd64-v1-v1.19.33-urltestfix5   (без списка зависимостей)
+mihomo-linux-amd64-v1-v1.19.33-urltestfix5: go1.26.10
 	build	-buildmode=exe
 	build	-compiler=gc
 	build	-tags=with_gvisor
@@ -301,17 +454,18 @@ mihomo-linux-amd64-v1-v1.19.33-urltestfix4: go1.26.10
 	build	GOOS=linux
 	build	GOAMD64=v1
 	build	vcs=git
-	build	vcs.revision=b3301b098a3eeda0cf99351d2e96d04a8cc28f2f
+	build	vcs.revision=c19df995c2a244e43e64734d6604a064df0a26d8
 	build	vcs.modified=false
 ```
 
 Сборка воспроизводима: повторная полная пересборка (`go build -a`) того же коммита той же командой
-(BuildTime задан строкой выше) дала тот же sha256 — проверено и для urltestfix3, и для urltestfix4.
+(BuildTime задан строкой выше) дала тот же sha256 — проверено для urltestfix3, urltestfix4 и urltestfix5.
+.gz упакован `gzip -n` (без имени и времени внутри архива), поэтому и он воспроизводим.
 
 Сравнение с официальным `mihomo-linux-amd64-v1-v1.19.33`: та же версия Go (go1.26.10), те же
 `-tags`, `CGO_ENABLED`, `GOAMD64`, `-trimpath`; строка `DefaultGODEBUG` совпадает полностью. Отличия:
 `vcs.revision` (наш коммит), `vcs.modified=false` (у официального `true` — из-за скопированного CA-bundle)
-и пустой встроенный CA-bundle (ниже).
+и пустой встроенный CA-bundle (ниже). Зависимости те же, что у тега: перенесённая правка SOCKS — только код.
 
 **Встроенные корневые сертификаты не заполнены.** Официальный CI перед сборкой копирует системный
 `/etc/ssl/certs/ca-certificates.crt` в `component/ca/ca-certificates.crt`. Здесь это сделать нельзя: в
@@ -319,16 +473,19 @@ mihomo-linux-amd64-v1-v1.19.33-urltestfix4: go1.26.10
 нельзя. Файл оставлен пустым, как в теге (0 байт). mihomo тогда использует системные сертификаты LXC
 (`x509.SystemCertPool()`) — в Debian это пакет `ca-certificates`. На практике: держать `ca-certificates` в
 контейнере установленным и обновлённым (`apt install ca-certificates`). Отсюда и разница в размере:
-.gz 22 818 048 байт (urltestfix4) против 22 893 964 у официального.
+.gz 22 828 099 байт (urltestfix5) против 22 893 964 у официального.
 
 `-t` на конфиге с группами из раздела 1 (`dist/integration/user-config/`, провайдер заменён локальным
-файлом с похожими именами узлов): `configuration file … test is successful` — и у этой сборки, и у
-официальной v1.19.33.
+файлом с похожими именами узлов; с urltestfix5 в нём `reliability: 90, delay-samples: 3` у url-test и
+`fail-confirm: true` у fallback): `configuration file … test is successful` — и у этой сборки, и у
+официальной v1.19.33. Официальная новые ключи молча игнорирует, так что откат на неё или на urltestfix4 конфиг
+не ломает.
 
 Короткий запуск на том же конфиге (URL проверки заменён на локальный 204, узлы — локальные SOCKS5 из
-`sim.py`, правило `MATCH,NON-RU-FIRST`), для urltestfix4 — с журналом и без: три запроса через
-mixed-port — `HTTP 204` за 0,04–0,06 с; ошибок в логе нет; без `MIHOMO_DIAG_DIR` каталог журнала не
-создаётся. С журналом на этих группах сразу видно окно после запуска: 4 из 5 url-test групп первые ~10 с
+`sim.py`, правило `MATCH,NON-RU-FIRST`), для urltestfix5 с новыми параметрами — с журналом и без: три запроса через
+mixed-port — `HTTP 204` за 0,04 с; ошибок в логе нет; без `MIHOMO_DIAG_DIR` каталог журнала не
+создаётся; в строках `config` журнала видны `reliability=90 delay_samples=3` и `fail_confirm=true`. Описание
+окна `COMPATIBLE` ниже — из запуска urltestfix4, в urltestfix5 оно то же. С журналом на этих группах сразу видно окно после запуска: 4 из 5 url-test групп первые ~10 с
 отдают `COMPATIBLE` (DIRECT), fallback-группы считают их живыми (их проверка — 1 мс, напрямую).
 Группы выбрали:
 
@@ -345,46 +502,67 @@ NON-RU-FIRST → PROXY-NON-RU, RU-FIRST → PROXY-RU, YOUTUBE и GOOGLE → PROX
 
 ## 6. Установка
 
-Файл: `mihomo-linux-amd64-v1-v1.19.33-urltestfix4.gz`
+Файл: `mihomo-linux-amd64-v1-v1.19.33-urltestfix5.gz`
 
 ```
-sha256 (.gz):          fa236819657820eba176b33567db86069a0a194d4cadee67b507e77480fbb51a
-sha256 (распакованный): 665680d29a9119766d2e1b29bd43e8b7a77ff32d6a27ae48d1e77c856bb4bd37
+sha256 (.gz):          e0ae196717cdd7f0ca4db05368c6bbbdcb915ff22a83c8219577f457b1b226a6
+sha256 (распакованный): 66818e1e2c47d57d28c67ff7907ee68bfe84df9e2ab4d60d4d1e0fb87d6b4a4d
 ```
 
 ```
 # на компьютере: скачать .gz, затем
-scp mihomo-linux-amd64-v1-v1.19.33-urltestfix4.gz root@10.0.9.1:/root/
+scp mihomo-linux-amd64-v1-v1.19.33-urltestfix5.gz root@10.0.9.1:/root/
 # на хосте Proxmox
-cd /root && gunzip -k mihomo-linux-amd64-v1-v1.19.33-urltestfix4.gz && sha256sum mihomo-linux-amd64-v1-v1.19.33-urltestfix4
-#   должно быть 665680d29a9119766d2e1b29bd43e8b7a77ff32d6a27ae48d1e77c856bb4bd37
-pct push 101 /root/mihomo-linux-amd64-v1-v1.19.33-urltestfix4 /usr/local/bin/mihomo.new --perms 0755
+cd /root && gunzip -k mihomo-linux-amd64-v1-v1.19.33-urltestfix5.gz && sha256sum mihomo-linux-amd64-v1-v1.19.33-urltestfix5
+#   должно быть 66818e1e2c47d57d28c67ff7907ee68bfe84df9e2ab4d60d4d1e0fb87d6b4a4d
+pct push 101 /root/mihomo-linux-amd64-v1-v1.19.33-urltestfix5 /usr/local/bin/mihomo.new --perms 0755
 pct enter 101
 # в контейнере
 /usr/local/bin/mihomo.new -v
+cd /etc/mihomo && cp -p config.yaml config.yaml.prev
+# новые параметры: url-test — reliability: 90, delay-samples: 3; fallback — fail-confirm: true
+sed -i '/type: url-test/{/reliability:/!s/tolerance: 80, /tolerance: 80, reliability: 90, delay-samples: 3, /}' config.yaml
+sed -i '/type: fallback/{/fail-confirm:/!s/interval: 60, /interval: 60, fail-confirm: true, /}' config.yaml
+grep -c 'reliability: 90, delay-samples: 3' config.yaml   # должно быть 5 (все url-test группы)
+grep -c 'fail-confirm: true' config.yaml                  # должно быть 4 (все fallback группы)
+diff config.yaml.prev config.yaml
 /usr/local/bin/mihomo.new -d /etc/mihomo -t
 cp -p /usr/local/bin/mihomo /usr/local/bin/mihomo.prev
 mv -f /usr/local/bin/mihomo.new /usr/local/bin/mihomo
 systemctl restart mihomo && systemctl status mihomo --no-pager -n 20 && mihomo -v
 ```
 
-* Откат: `cp -p /usr/local/bin/mihomo.prev /usr/local/bin/mihomo.tmp && mv -f /usr/local/bin/mihomo.tmp /usr/local/bin/mihomo && systemctl restart mihomo`
-  (поверх работающего файла писать нельзя — Text file busy, поэтому копия + `mv`).
+`sed` рассчитан на группы в одну строку, как в вашем конфиге (`- {name: …, type: url-test, …, tolerance: 80, …}`).
+Если счётчики показали не 5 и 4, допишите параметры вручную в нужные группы: в url-test —
+`reliability: 90, delay-samples: 3`, в fallback — `fail-confirm: true`.
+
+* Откат бинарника: `cp -p /usr/local/bin/mihomo.prev /usr/local/bin/mihomo.tmp && mv -f /usr/local/bin/mihomo.tmp /usr/local/bin/mihomo && systemctl restart mihomo`
+  (поверх работающего файла писать нельзя — Text file busy, поэтому копия + `mv`). Конфиг с новыми
+  параметрами откатывать не обязательно: urltestfix4 и официальная сборка их молча игнорируют. Вернуть
+  прежний — `cp -p /etc/mihomo/config.yaml.prev /etc/mihomo/config.yaml`.
 * После перезапуска fallback-группы до 1 минуты могут стоять на запасных (окно после запуска, interval 60) — это нормально.
 * Кнопку обновления ядра в панели не нажимать: она поставит официальную сборку без правок.
-* Диагностический журнал включается отдельно — `dist/DIAG.md`. Что смотреть: переключений url-test в :03
-  (минута после обновления подписки) должно стать заметно меньше; Δ не должен превышать tolerance.
+* Служба и `MIHOMO_DIAG_DIR` не меняются: журнал продолжит писаться в тот же каталог. Что смотреть через
+  неделю: переключений url-test должно стать в разы меньше, причины `unreliable` — изредка; у fallback —
+  строки `fallback-confirm` (почти все `result=alive`) вместо коротких уходов на запасные; в `runtime` —
+  `alloc` и `new_conns` в минуту ежечасного всплеска памяти.
+* Архив журнала собирать полной командой из `dist/DIAG.md` — она добавляет `journal-lifecycle.txt`
+  (перезапуски и падения службы из journald).
 
 ## 7. Файлы
 
-* `dist/mihomo-linux-amd64-v1-v1.19.33-urltestfix4.gz`, `dist/SHA256SUMS` — сборка;
+* `dist/mihomo-linux-amd64-v1-v1.19.33-urltestfix5.gz`, `dist/SHA256SUMS` — сборка (прежние .gz — в истории git);
 * `dist/DIAG.md` — диагностический журнал: включение, команда сбора, формат; `dist/MAINTENANCE.md` — как
   обновлять сборку на новые релизы upstream;
 * `dist/integration/analyze_diag.py` — сводка по присланному журналу (`python3 analyze_diag.py архив.tar.gz`);
-* `dist/integration/sim.py` — имитация узлов (SOCKS5 с управляемой задержкой/режимом) и цели 204;
-* `dist/integration/scenarios.py` — сценарии S1–S6; запуск: `python3 scenarios.py <mihomo> <метка> <каталог>`;
-* `dist/integration/results/` — итоговые `summary-*.json`, ход каждого прогона (`*.events.txt`),
+* `dist/integration/sim.py` — имитация узлов (SOCKS5 с управляемой задержкой/режимом, разовыми и
+  периодическими сбоями: `fail_next`, `fail_every`, `spike_next`) и цели 204;
+* `dist/integration/scenarios.py` — сценарии S1–S9; запуск: `python3 scenarios.py <mihomo> <метка> <каталог> [S1 …]`
+  (`SIM_DIAG=1` — с диагностическим журналом);
+* `dist/integration/results/fix5/` — прогоны urltestfix5: `summary-v4/v5/v5diag.json`, ход каждого сценария,
+  `run.log`, логи и конфиги (`mihomo-logs.tar.gz`), образцы журнала (`diag-sample/`);
+* `dist/integration/results/` — прогоны urltestfix3/4: итоговые `summary-*.json`, ход каждого прогона (`*.events.txt`),
   общий вывод (`run.log`), логи и конфиги mihomo всех прогонов (`mihomo-logs.tar.gz`);
 * `dist/integration/results/unit/` — вывод модульных тестов на clean/c1/v2/v3, `vet`/`-race`, сводка
   полного `go test`;
-* `dist/integration/user-config/` — конфиг для `-t` с группами из прода.
+* `dist/integration/user-config/` — конфиг для `-t` с группами из прода (с новыми параметрами urltestfix5).

@@ -162,3 +162,31 @@ ls -la /root/mihomo-diag-*.tar.gz
 2026-10-22T18:35:50.251Z max-failed group="UT" failures=3 window=5000ms failed multiple times: health check of the group's providers (0 more in the previous 10 s+ not logged)
 2026-10-22T18:35:24.972Z fallback group="FB" from="UT" to="BK" fixed="" members=["UT":dead "BK":81]
 ```
+
+Строки, добавленные в urltestfix5 (сценарии S7, S9 и S2 имитации; у url-test — `reliability: 90, delay-samples: 3`,
+у fallback — `fail-confirm: true`):
+
+```
+2026-10-29T13:25:01.927Z config url-test="UT" url=http://127.0.0.1:18204/generate_204 expected="*" tolerance=50 reliability=90 delay_samples=3 max_failed=5 timeout=5000 providers=["sim"] members=3
+2026-10-29T13:25:41.928Z status url-test="UT" now="a" delay=41 best="a" best_delay=41 delta=0 tol=50 alive=3 dead=0 untested=0 total=3 fixed="" decided=5s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=4/4 last=341 best_ok=4/4 unreliable=0
+2026-10-29T13:26:07.005Z url-test group="UT" from="a" to="b" reason=slower from_delay=301 to_delay=120 best="b" best_delay=120 tol=50 from_ok=6/6 to_ok=6/6 best_ok=6/6 from_last=301
+2026-10-29T13:20:32.277Z provider-update provider="sim" version=2 proxies=34 (all recreated, 34 kept their history) added=0 removed=0 added:[] removed:[]
+2026-10-29T13:27:39.336Z config fallback="FB" url=http://127.0.0.1:18204/generate_204 expected="204" fail_confirm=true max_failed=5 timeout=1000 providers=["FB"] members=["UT" "BK"]
+2026-10-29T13:27:53.437Z fallback-confirm group="FB" member="UT" result=alive after=1105ms delay=51
+2026-10-29T13:28:04.337Z status fallback="FB" now="UT" chain="UT → u1" leaf_delay=51 fixed="" members=["UT":suspect "BK":81] dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0
+2026-10-29T13:28:12.334Z fallback-confirm group="FB" member="UT" result=dead after=2001ms err="context deadline exceeded"
+2026-10-29T13:28:12.366Z fallback group="FB" from="UT" to="BK" fixed="" members=["UT":dead "BK":81]
+2026-10-29T13:27:44.338Z status url-test="UT" now="COMPATIBLE" delay=- best="u1" best_delay=51 delta=- tol=50 alive=1 dead=0 untested=0 total=1 fixed="" decided=5s reason=first dial_ok=0 dial_fail=0 hc_ok=2 hc_fail=0 empty_fallback=true
+2026-10-29T13:20:50.936Z runtime uptime=40s goroutines=18 heap=4MiB alloc=1MiB sys=21MiB rss=51MiB gc=3 conns=0 new_conns=5 up=0MiB down=0MiB
+```
+
+Как читать:
+
+* Вторая строка — одиночный всплеск. Последний замер узла `a` — 341 мс (`last`), но группа сравнивает
+  медиану трёх последних (`delay=41`) и остаётся на месте.
+* Третья строка — узел стал медленным насовсем: после второго медленного замера медиана 301 мс, группа
+  уходит. Все проверки при этом успешны (`from_ok=6/6`), так что причина — `slower`, а не `unreliable`.
+* `fallback-confirm` — повторная проверка через ~1 с после проваленной. Пока она идёт, участник в `status`
+  помечен `suspect` и остаётся в работе. `result=dead` — провал подтверждён, только тогда fallback уходит на
+  запасной.
+* `hc_ok=2` у url-test в окне `COMPATIBLE` — это проверки fallback-группы, прошедшие через неё напрямую.
