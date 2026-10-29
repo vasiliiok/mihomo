@@ -51,7 +51,7 @@ func TestHealthCheckDiagLogsRounds(t *testing.T) {
 		`hc-node provider="sub" round=`,
 		`node="a" ok=true delay=- full=`,
 		`hc-skip provider="sub" reason=tick`,
-		`provider-update provider="sub" version=2 proxies=1 (all recreated) added=1 removed=1 added:["b"] removed:["a"]`,
+		`provider-update provider="sub" version=2 proxies=1 (all recreated, 0 kept their history) added=1 removed=1 added:["b"] removed:["a"]`,
 		`hc-recheck provider="sub"`,
 		`reason=update proxies=1 version=1`,
 		`node="b" ok=true`,

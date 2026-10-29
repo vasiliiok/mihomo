@@ -73,7 +73,7 @@ func diagRecheck(hc *HealthCheck) {
 }
 
 // diagSetProxies logs a provider update; called with the old list still in place.
-func diagSetProxies(name string, version uint32, old, proxies []C.Proxy) {
+func diagSetProxies(name string, version uint32, old, proxies []C.Proxy, inherited int) {
 	if !diag.Enabled() {
 		return
 	}
@@ -99,8 +99,8 @@ func diagSetProxies(name string, version uint32, old, proxies []C.Proxy) {
 			removed = append(removed, n)
 		}
 	}
-	diag.Log("provider-update", "provider=%q version=%d proxies=%d (all recreated) added=%d removed=%d %s %s",
-		name, version, len(proxies), len(added), len(removed),
+	diag.Log("provider-update", "provider=%q version=%d proxies=%d (all recreated, %d kept their history) added=%d removed=%d %s %s",
+		name, version, len(proxies), inherited, len(added), len(removed),
 		"added:"+diag.Names(added, 30), "removed:"+diag.Names(removed, 30))
 }
 

@@ -103,13 +103,41 @@ func (bp *baseProvider) RegisterHealthCheckTask(url string, expectedStatus utils
 func (bp *baseProvider) setProxies(proxies []C.Proxy) {
 	bp.mutex.Lock()
 	defer bp.mutex.Unlock()
-	diagSetProxies(bp.name, bp.version+1, bp.proxies, proxies)
+	inherited := inheritHealth(bp.proxies, proxies)
+	diagSetProxies(bp.name, bp.version+1, bp.proxies, proxies, inherited)
 	bp.proxies = proxies
 	bp.version += 1
 	bp.healthCheck.setProxies(proxies)
 	if bp.healthCheck.auto() {
 		go bp.healthCheck.recheck()
 	}
+}
+
+// inheritHealth lets every new proxy that replaces an unchanged node (same name, type
+// and address) keep the node's health check history, so it is not reset on every
+// subscription update. It returns how many proxies inherited a history.
+func inheritHealth(old, proxies []C.Proxy) int {
+	if len(old) == 0 {
+		return 0
+	}
+	byName := make(map[string]*adapter.Proxy, len(old))
+	for _, p := range old {
+		if ap, ok := p.(*adapter.Proxy); ok {
+			byName[p.Name()] = ap
+		}
+	}
+	n := 0
+	for _, p := range proxies {
+		np, ok := p.(*adapter.Proxy)
+		if !ok {
+			continue
+		}
+		if op := byName[p.Name()]; op != nil && op != np && op.Type() == np.Type() && op.Addr() == np.Addr() {
+			np.InheritHealth(op)
+			n++
+		}
+	}
+	return n
 }
 
 func (bp *baseProvider) Close() error {

@@ -283,6 +283,20 @@ func (p *Proxy) URLTest(ctx context.Context, url string, expectedStatus utils.In
 	return
 }
 
+// InheritHealth copies the health check results of old into p. A provider calls it
+// when p replaces old for an unchanged node, so the node's history survives the
+// recreation of its object on every subscription update.
+func (p *Proxy) InheritHealth(old *Proxy) {
+	p.alive.Store(old.alive.Load())
+	p.history.Put(old.history.Copy()...)
+	old.extra.Range(func(url string, state *internalProxyState) bool {
+		history := queue.New[C.DelayHistory](defaultHistoriesNum)
+		history.Put(state.history.Copy()...)
+		p.extra.Store(url, &internalProxyState{history: history, alive: atomic.NewBool(state.alive.Load())})
+		return true
+	})
+}
+
 func NewProxy(adapter C.ProxyAdapter) *Proxy {
 	return &Proxy{
 		ProxyAdapter: adapter,

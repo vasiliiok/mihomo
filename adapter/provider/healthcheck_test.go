@@ -64,3 +64,34 @@ func TestHealthCheckTestsProxiesReplacedDuringACheck(t *testing.T) {
 		t.Fatal("proxies set during a running health check were not tested")
 	}
 }
+
+func TestProviderUpdateKeepsHistoryOfUnchangedNodes(t *testing.T) {
+	url := "https://www.gstatic.com/generate_204"
+	node := func(name string, port int) C.Proxy {
+		s, err := outbound.NewSocks5(outbound.Socks5Option{Name: name, Server: "127.0.0.1", Port: port})
+		require.NoError(t, err)
+		return adapter.NewProxy(s)
+	}
+	failedCheck := func(p C.Proxy) {
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+		_, _ = p.URLTest(ctx, url, nil)
+	}
+
+	old := []C.Proxy{node("same", 1080), node("moved", 1081)}
+	for _, p := range old {
+		failedCheck(p)
+	}
+	hc := NewHealthCheck(old, url, 5000, 0, false, nil)
+	defer hc.close()
+	bp := &baseProvider{name: "sub", proxies: old, healthCheck: hc}
+
+	fresh := []C.Proxy{node("same", 1080), node("moved", 2081), node("added", 1082)}
+	bp.setProxies(fresh)
+
+	require.Len(t, fresh[0].ExtraDelayHistories()[url].History, 1, "an unchanged node lost its history")
+	require.False(t, fresh[0].AliveForTestUrl(url))
+	require.Empty(t, fresh[1].ExtraDelayHistories(), "a node with a new address must start afresh")
+	require.True(t, fresh[1].AliveForTestUrl(url))
+	require.Empty(t, fresh[2].ExtraDelayHistories())
+}
