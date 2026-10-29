@@ -431,11 +431,13 @@ def s7(run):
     run.log("a: one check 300 ms slower (340 ms), then back to 40 ms")
     sim_set({"20001": {"spike_next": 1, "spike_ms": 300}})
     spike = run.watch(["UT"], 26)
-    run.log("a: 300 ms for good")
+    returned = run.wait_now("UT", "a", 30)  # a build that left a comes back once a is fast again
+    run.log(f"a: 300 ms for good (UT back on a: {returned})")
     sim_set({"20001": {"latency": 300}})
     t = time.time()
     left = run.wait_now("UT", "b", 45)
-    run.result = {"spike_changes": spike[1:], "slow_left_after_s": round(time.time() - t, 1) if left else None,
+    run.result = {"spike_changes": spike[1:], "back_on_a_before_slowdown": returned,
+                  "slow_left_after_s": round(time.time() - t, 1) if left else None,
                   "final_UT": run.now("UT")}
     run.result["fixed"] = len(spike) == 1 and left
 
