@@ -28,6 +28,10 @@ var (
 	startOnce sync.Once
 	loopOnce  sync.Once
 	started   = time.Now()
+
+	// the totals at the previous runtime line; only the report loop uses them
+	prevAlloc  uint64
+	prevJoined int64
 )
 
 // Starting logs the start of mihomo; called before the configuration is applied.
@@ -117,7 +121,10 @@ func report() {
 		return true
 	})
 	up, down := statistic.DefaultManager.Total()
-	diag.Log("runtime", "uptime=%s goroutines=%d heap=%dMiB sys=%dMiB rss=%dMiB gc=%d conns=%d up=%dMiB down=%dMiB",
-		time.Since(started).Round(time.Second), runtime.NumGoroutine(), ms.HeapAlloc>>20, ms.Sys>>20,
-		statistic.DefaultManager.Memory()>>20, ms.NumGC, conns, up>>20, down>>20)
+	joined := statistic.DefaultManager.Joined()
+	// alloc: allocated since the previous line, freed or not; new_conns: connections opened since then
+	diag.Log("runtime", "uptime=%s goroutines=%d heap=%dMiB alloc=%dMiB sys=%dMiB rss=%dMiB gc=%d conns=%d new_conns=%d up=%dMiB down=%dMiB",
+		time.Since(started).Round(time.Second), runtime.NumGoroutine(), ms.HeapAlloc>>20, (ms.TotalAlloc-prevAlloc)>>20, ms.Sys>>20,
+		statistic.DefaultManager.Memory()>>20, ms.NumGC, conns, joined-prevJoined, up>>20, down>>20)
+	prevAlloc, prevJoined = ms.TotalAlloc, joined
 }

@@ -272,7 +272,6 @@ func (gb *GroupBase) onDialFailed(adapterType C.AdapterType, err error, fn func(
 	if errors.Is(err, C.ErrNotSupport) {
 		return
 	}
-	gb.diagDialFailed()
 
 	go func() {
 		if strings.Contains(err.Error(), "connection refused") {

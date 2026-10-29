@@ -2,6 +2,7 @@ package diag
 
 import (
 	"compress/gzip"
+	"context"
 	"errors"
 	"io"
 	"os"
@@ -91,4 +92,13 @@ func TestConfigure(t *testing.T) {
 	require.Equal(t, 3, keepDays)
 	keepDays = 14
 	interval = time.Minute
+}
+
+func TestMarkHealthCheck(t *testing.T) {
+	SetDir("")
+	require.False(t, IsHealthCheck(MarkHealthCheck(context.Background())), "marked while the log is off")
+	SetDir(t.TempDir())
+	defer SetDir("")
+	require.True(t, IsHealthCheck(MarkHealthCheck(context.Background())))
+	require.False(t, IsHealthCheck(context.Background()))
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/metacubex/mihomo/common/utils"
 	"github.com/metacubex/mihomo/common/xsync"
 	"github.com/metacubex/mihomo/component/ca"
+	"github.com/metacubex/mihomo/component/diag"
 	C "github.com/metacubex/mihomo/constant"
 	"github.com/metacubex/mihomo/log"
 
@@ -200,6 +201,7 @@ func (p *Proxy) URLTest(ctx context.Context, url string, expectedStatus utils.In
 	}()
 
 	unifiedDelay := UnifiedDelay.Load()
+	ctx = diag.MarkHealthCheck(ctx)
 
 	addr, err := urlToMetadata(url)
 	if err != nil {

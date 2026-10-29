@@ -36,7 +36,6 @@ func (f *Fallback) Now() string {
 func (f *Fallback) DialContext(ctx context.Context, metadata *C.Metadata) (C.Conn, error) {
 	proxy := f.findAliveProxy(true)
 	c, err := proxy.DialContext(ctx, metadata)
-	f.diagDialed(err)
 	if err == nil {
 		c.AppendToChains(f)
 	} else {
@@ -45,12 +44,15 @@ func (f *Fallback) DialContext(ctx context.Context, metadata *C.Metadata) (C.Con
 
 	if N.NeedHandshake(c) {
 		c = callback.NewFirstWriteCallBackConn(c, func(err error) {
+			f.diagDialed(ctx, err)
 			if err == nil {
 				f.onDialSuccess()
 			} else {
 				f.onDialFailed(proxy.Type(), err, f.healthCheck)
 			}
 		})
+	} else {
+		f.diagDialed(ctx, err)
 	}
 
 	return c, err
@@ -60,7 +62,7 @@ func (f *Fallback) DialContext(ctx context.Context, metadata *C.Metadata) (C.Con
 func (f *Fallback) ListenPacketContext(ctx context.Context, metadata *C.Metadata) (C.PacketConn, error) {
 	proxy := f.findAliveProxy(true)
 	pc, err := proxy.ListenPacketContext(ctx, metadata)
-	f.diagDialed(err)
+	f.diagDialed(ctx, err)
 	if err == nil {
 		pc.AppendToChains(f)
 	}

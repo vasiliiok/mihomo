@@ -1,6 +1,9 @@
 package outboundgroup
 
 import (
+	"context"
+	"io"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
@@ -177,4 +180,55 @@ func TestFallbackDiagLogsConfirmation(t *testing.T) {
 	require.Contains(t, got[0], `group="fallback" member="main" result=dead after=`)
 	require.Contains(t, got[0], `err="timeout"`)
 	require.Contains(t, grep(lines(), " fallback ")[1], `from="main" to="spare" fixed="" members=["main":dead "spare":90]`)
+}
+
+// earlyConn is a connection whose handshake waits for the first write, like vless.
+type earlyConn struct{ C.Conn }
+
+func (earlyConn) NeedHandshake() bool { return true }
+
+type earlyProxy struct {
+	*fakeDelayProxy
+	writeErr error
+}
+
+func (p *earlyProxy) DialContext(context.Context, *C.Metadata) (C.Conn, error) {
+	a, b := net.Pipe()
+	go func() { _, _ = io.Copy(io.Discard, b) }()
+	if p.writeErr != nil {
+		_ = a.Close()
+	}
+	return earlyConn{outbound.NewConn(a, p.fakeDelayProxy)}, nil
+}
+
+func TestGroupDiagCountsDialsAfterHandshakeAndApartFromHealthChecks(t *testing.T) {
+	_ = diagLines(t)
+	node := &earlyProxy{fakeDelayProxy: newDelayProxy("node-1", true, 50)}
+	pd := &fakeProxyProvider{}
+	pd.update([]C.Proxy{node})
+	group := newTestURLTest(t, pd, 80)
+	metadata := &C.Metadata{}
+
+	// dialed but nothing written yet: not counted
+	c, err := group.DialContext(context.Background(), metadata)
+	require.NoError(t, err)
+	require.Contains(t, group.diagDials(), "dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0")
+	_, err = c.Write([]byte("x"))
+	require.NoError(t, err)
+	_ = c.Close()
+
+	// the handshake fails on the first write
+	node.writeErr = io.ErrClosedPipe
+	c, err = group.DialContext(context.Background(), metadata)
+	require.NoError(t, err)
+	_, _ = c.Write([]byte("x"))
+
+	// a health check of a group that uses this one
+	node.writeErr = nil
+	c, err = group.DialContext(diag.MarkHealthCheck(context.Background()), metadata)
+	require.NoError(t, err)
+	_, _ = c.Write([]byte("x"))
+	_ = c.Close()
+
+	require.Contains(t, group.diagDials(), "dial_ok=1 dial_fail=1 hc_ok=1 hc_fail=0")
 }

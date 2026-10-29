@@ -19,6 +19,7 @@ func init() {
 		downloadBlip:  atomic.NewInt64(0),
 		uploadTotal:   atomic.NewInt64(0),
 		downloadTotal: atomic.NewInt64(0),
+		joined:        atomic.NewInt64(0),
 		pid:           int32(os.Getpid()),
 	}
 
@@ -35,10 +36,17 @@ type Manager struct {
 	downloadTotal atomic.Int64
 	pid           int32
 	memory        uint64
+	joined        atomic.Int64 // connections ever joined, for the diagnostic log
 }
 
 func (m *Manager) Join(c Tracker) {
 	m.connections.Store(c.ID(), c)
+	m.joined.Add(1)
+}
+
+// Joined returns how many connections have joined since the start.
+func (m *Manager) Joined() int64 {
+	return m.joined.Load()
 }
 
 func (m *Manager) Leave(c Tracker) {

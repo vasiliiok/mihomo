@@ -1,6 +1,8 @@
 package outboundgroup
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -20,22 +22,32 @@ type diagState struct {
 	refDelay uint16    // delay of the object the pick was judged by (url-test)
 	at       time.Time // when it was picked (url-test)
 
-	dialOK   atomic.Int64 // since the previous status line
+	dialOK   atomic.Int64 // client connections since the previous status line
 	dialFail atomic.Int64
+	hcOK     atomic.Int64 // health check connections of the groups that use this one
+	hcFail   atomic.Int64
 
 	maxFailedAt         time.Time // last max-failed line
 	maxFailedSuppressed int       // max-failed events not logged since then
 }
 
-func (gb *GroupBase) diagDialed(err error) {
-	if err == nil && diag.Enabled() {
-		gb.diagSt.dialOK.Add(1)
+// diagDialed counts a connection through the group. For a protocol with a deferred
+// handshake call it on the first write: the dial itself succeeds without the server.
+func (gb *GroupBase) diagDialed(ctx context.Context, err error) {
+	if !diag.Enabled() || errors.Is(err, C.ErrNotSupport) {
+		return
 	}
-}
-
-func (gb *GroupBase) diagDialFailed() {
-	if diag.Enabled() {
-		gb.diagSt.dialFail.Add(1)
+	st := &gb.diagSt
+	hc := diag.IsHealthCheck(ctx)
+	switch {
+	case err == nil && hc:
+		st.hcOK.Add(1)
+	case err == nil:
+		st.dialOK.Add(1)
+	case hc:
+		st.hcFail.Add(1)
+	default:
+		st.dialFail.Add(1)
 	}
 }
 
@@ -60,7 +72,9 @@ func (gb *GroupBase) diagMaxFailed(why string, failures int) {
 }
 
 func (gb *GroupBase) diagDials() string {
-	return fmt.Sprintf("dial_ok=%d dial_fail=%d", gb.diagSt.dialOK.Swap(0), gb.diagSt.dialFail.Swap(0))
+	st := &gb.diagSt
+	return fmt.Sprintf("dial_ok=%d dial_fail=%d hc_ok=%d hc_fail=%d",
+		st.dialOK.Swap(0), st.dialFail.Swap(0), st.hcOK.Swap(0), st.hcFail.Swap(0))
 }
 
 func (gb *GroupBase) diagProviders() string {

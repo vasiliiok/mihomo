@@ -15,6 +15,7 @@ package diag
 
 import (
 	"compress/gzip"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -267,4 +268,21 @@ func Names(names []string, limit int) string {
 	}
 	b.WriteByte(']')
 	return b.String()
+}
+
+type healthCheckKey struct{}
+
+// MarkHealthCheck marks ctx as the context of a health check, so that the groups the
+// check goes through count its connections apart from the clients' ones.
+func MarkHealthCheck(ctx context.Context) context.Context {
+	if !Enabled() {
+		return ctx
+	}
+	return context.WithValue(ctx, healthCheckKey{}, true)
+}
+
+// IsHealthCheck reports whether ctx was marked by MarkHealthCheck.
+func IsHealthCheck(ctx context.Context) bool {
+	v, _ := ctx.Value(healthCheckKey{}).(bool)
+	return v
 }

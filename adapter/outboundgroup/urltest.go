@@ -63,7 +63,6 @@ func (u *URLTest) ForceSet(name string) {
 func (u *URLTest) DialContext(ctx context.Context, metadata *C.Metadata) (c C.Conn, err error) {
 	proxy := u.fast(true)
 	c, err = proxy.DialContext(ctx, metadata)
-	u.diagDialed(err)
 	if err == nil {
 		c.AppendToChains(u)
 	} else {
@@ -72,12 +71,15 @@ func (u *URLTest) DialContext(ctx context.Context, metadata *C.Metadata) (c C.Co
 
 	if N.NeedHandshake(c) {
 		c = callback.NewFirstWriteCallBackConn(c, func(err error) {
+			u.diagDialed(ctx, err)
 			if err == nil {
 				u.onDialSuccess()
 			} else {
 				u.onDialFailed(proxy.Type(), err, u.healthCheck)
 			}
 		})
+	} else {
+		u.diagDialed(ctx, err)
 	}
 
 	return c, err
@@ -87,7 +89,7 @@ func (u *URLTest) DialContext(ctx context.Context, metadata *C.Metadata) (c C.Co
 func (u *URLTest) ListenPacketContext(ctx context.Context, metadata *C.Metadata) (C.PacketConn, error) {
 	proxy := u.fast(true)
 	pc, err := proxy.ListenPacketContext(ctx, metadata)
-	u.diagDialed(err)
+	u.diagDialed(ctx, err)
 	if err == nil {
 		pc.AppendToChains(u)
 	} else {
