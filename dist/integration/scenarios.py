@@ -442,38 +442,27 @@ def s7(run):
 
 # ---- S8: a fast node that fails every third check (url-test reliability) -----
 def s8(run):
+    # No client traffic: the sim counts connections, and traffic through the node
+    # would decide which of them fail (5 requests + 1 check per interval keep the
+    # check on the same remainder, and it never fails). Here every third check fails.
     ports = {20001: {**ok(30), "fail_every": 3}, 20002: ok(90)}
     nodes = [("flaky", 20001), ("steady", 20002)]
     groups = f"""  - {{name: UT, type: url-test, url: "{URL}", tolerance: 30, reliability: 90, delay-samples: 3, max-failed-times: 3, include-all: true, lazy: false}}"""
     run.start(ports, nodes, groups, interval=5, timeout=1000, rules="MATCH,UT")
-    results, lock = [], threading.Lock()
-
-    def request():
-        code = run.curl()
-        with lock:
-            results.append(code)
-
-    changes, last, on_flaky = [], None, 0
+    changes, last, on_flaky, polls = [], None, 0, 0
     end = time.time() + 90
-    next_traffic = time.time()
     while time.time() < end:
-        if time.time() >= next_traffic:
-            threading.Thread(target=request, daemon=True).start()
-            next_traffic += 1
         n = run.now("UT")
+        polls += 1
         on_flaky += n == "flaky"
         if n != last:
             last = n
             changes.append((round(time.time() - run.t0, 2), n))
             run.log(f"UT.now = {n}")
         time.sleep(0.25)
-    time.sleep(4)
-    with lock:
-        failed = sum(code != "204" for code in results)
-        total = len(results)
-    polls = 90 / 0.25
+    checks = [h["delay"] for h in api("/proxies/flaky")["extra"].get(URL, {}).get("history", [])]
     run.result = {"switches": len(changes) - 1, "share_on_flaky": round(on_flaky / polls, 2),
-                  "requests": total, "failed_requests": failed, "changes": changes[:12]}
+                  "flaky_last_checks": checks, "changes": changes[:12]}
     run.result["fixed"] = len(changes) <= 3
 
 
