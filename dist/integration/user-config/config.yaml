@@ -22,15 +22,15 @@ proxy-providers:
       lazy: false
 
 proxy-groups:
-  - {name: PROXY-NON-RU, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, max-failed-times: 3, include-all: true, exclude-filter: '🇷🇺', lazy: false}
-  - {name: PROXY-RU, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, max-failed-times: 3, include-all: true, filter: '🇷🇺', lazy: false}
-  - {name: PROXY-YOUTUBE, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, max-failed-times: 3, include-all: true, filter: '⚡', exclude-filter: '⭐', lazy: false}
-  - {name: PROXY-GEMINI, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, max-failed-times: 3, include-all: true, filter: '⭐', exclude-filter: '⚡', lazy: false}
-  - {name: PROXY-YOUTUBE-GEMINI, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, max-failed-times: 3, include-all: true, filter: '^(?=.*⚡)(?=.*⭐)', lazy: false}
-  - {name: NON-RU-FIRST, type: fallback, proxies: [PROXY-NON-RU, PROXY-RU], url: "https://www.gstatic.com/generate_204", expected-status: 204, interval: 60, max-failed-times: 3, lazy: false}
-  - {name: RU-FIRST, type: fallback, proxies: [PROXY-RU, PROXY-NON-RU], url: "https://www.gstatic.com/generate_204", expected-status: 204, interval: 60, max-failed-times: 3, lazy: false}
-  - {name: YOUTUBE, type: fallback, proxies: [PROXY-YOUTUBE-GEMINI, PROXY-YOUTUBE, PROXY-NON-RU], url: "https://www.gstatic.com/generate_204", expected-status: 204, interval: 60, max-failed-times: 3, lazy: false}
-  - {name: GOOGLE, type: fallback, proxies: [PROXY-YOUTUBE-GEMINI, PROXY-GEMINI, PROXY-NON-RU], url: "https://www.gstatic.com/generate_204", expected-status: 204, interval: 60, max-failed-times: 3, lazy: false}
+  - {name: PROXY-NON-RU, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, reliability: 90, delay-samples: 3, max-failed-times: 3, include-all: true, exclude-filter: '🇷🇺', lazy: false}
+  - {name: PROXY-RU, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, reliability: 90, delay-samples: 3, max-failed-times: 3, include-all: true, filter: '🇷🇺', lazy: false}
+  - {name: PROXY-YOUTUBE, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, reliability: 90, delay-samples: 3, max-failed-times: 3, include-all: true, filter: '⚡', exclude-filter: '⭐', lazy: false}
+  - {name: PROXY-GEMINI, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, reliability: 90, delay-samples: 3, max-failed-times: 3, include-all: true, filter: '⭐', exclude-filter: '⚡', lazy: false}
+  - {name: PROXY-YOUTUBE-GEMINI, type: url-test, url: "https://www.gstatic.com/generate_204", tolerance: 80, reliability: 90, delay-samples: 3, max-failed-times: 3, include-all: true, filter: '^(?=.*⚡)(?=.*⭐)', lazy: false}
+  - {name: NON-RU-FIRST, type: fallback, proxies: [PROXY-NON-RU, PROXY-RU], url: "https://www.gstatic.com/generate_204", expected-status: 204, interval: 60, fail-confirm: true, max-failed-times: 3, lazy: false}
+  - {name: RU-FIRST, type: fallback, proxies: [PROXY-RU, PROXY-NON-RU], url: "https://www.gstatic.com/generate_204", expected-status: 204, interval: 60, fail-confirm: true, max-failed-times: 3, lazy: false}
+  - {name: YOUTUBE, type: fallback, proxies: [PROXY-YOUTUBE-GEMINI, PROXY-YOUTUBE, PROXY-NON-RU], url: "https://www.gstatic.com/generate_204", expected-status: 204, interval: 60, fail-confirm: true, max-failed-times: 3, lazy: false}
+  - {name: GOOGLE, type: fallback, proxies: [PROXY-YOUTUBE-GEMINI, PROXY-GEMINI, PROXY-NON-RU], url: "https://www.gstatic.com/generate_204", expected-status: 204, interval: 60, fail-confirm: true, max-failed-times: 3, lazy: false}
 
 rules:
   - MATCH,NON-RU-FIRST

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Integration scenarios S1–S6 for mihomo url-test / health-check fixes.
+"""Integration scenarios S1–S9 for mihomo url-test / health-check / fallback fixes.
 
 usage: scenarios.py <mihomo binary> <build label> <out dir> [scenario ...]
 
@@ -8,6 +8,7 @@ fresh mihomo with a file provider, then changes the provider file or the node
 behaviour and watches the groups through the external controller.
 """
 import datetime
+import glob
 import json
 import os
 import re
@@ -175,6 +176,16 @@ rules:
         pd = api("/providers/proxies/sim")
         return [p["name"] for p in pd["proxies"] if p.get("extra", {}).get(url, {}).get("history")]
 
+    def tested_since(self, t_abs, url=URL):
+        """names of current provider proxies whose last result for url is newer than t_abs"""
+        pd = api("/providers/proxies/sim")
+        out = []
+        for p in pd["proxies"]:
+            history = p.get("extra", {}).get(url, {}).get("history") or []
+            if history and parse_time(history[-1]["time"]) > t_abs:
+                out.append(p["name"])
+        return out
+
     def log_events(self, pattern, since=0.0):
         """(t, line) of mihomo log lines matching pattern, t relative to t0"""
         out = []
@@ -185,11 +196,28 @@ rules:
                 m = re.search(r'time="([^"]+)"', line)
                 if not m:
                     continue
-                ts = re.sub(r"(\.\d{6})\d*", r"\1", m.group(1)).replace("Z", "+00:00")
-                t = datetime.datetime.fromisoformat(ts).timestamp() - self.t0
+                t = parse_time(m.group(1)) - self.t0
                 if t >= since:
                     out.append((round(t, 2), re.search(r'msg="(.*)"', line).group(1)))
         return out
+
+
+def diag_count(run, word):
+    """lines with word in the diagnostic log of the run (SIM_DIAG=1), else None"""
+    files = glob.glob(os.path.join(run.dir, "diag", "diag-*.log"))
+    if not files:
+        return None
+    n = 0
+    for name in files:
+        with open(name) as f:
+            n += sum(word in line for line in f)
+    return n
+
+
+def parse_time(ts):
+    """unix time of a Go RFC 3339 timestamp (nanoseconds, Z or offset)"""
+    ts = re.sub(r"(\.\d{6})\d*", r"\1", ts).replace("Z", "+00:00")
+    return datetime.datetime.fromisoformat(ts).timestamp()
 
 
 def groups_basic(tolerance=50, fb_interval=10):
@@ -310,7 +338,9 @@ def s4(run):
     timeline = []
     end = time.time() + 30
     while time.time() < end:
-        n = len(run.tested())
+        # a result newer than the reload: since urltestfix5 the new objects inherit
+        # the history of the old ones, so having any history proves nothing
+        n = len(run.tested_since(run.t0 + t_upd))
         t = round(time.time() - run.t0 - t_upd, 1)
         if not timeline or timeline[-1][1] != n:
             timeline.append((t, n))
@@ -389,7 +419,97 @@ def s6(run):
     run.result["fixed"] = final == "j1"
 
 
-SCENARIOS = {"S1": s1, "S2": s2, "S3": s3, "S4": s4, "S5": s5, "S6": s6}
+# ---- S7: one slow check of the selected node (url-test delay-samples) --------
+def s7(run):
+    # provider interval 12 s > the 10 s url-test cache: every result is seen by a pick
+    ports = {20001: ok(40), 20002: ok(120), 20003: ok(200)}
+    nodes = [("a", 20001), ("b", 20002), ("c", 20003)]
+    groups = f"""  - {{name: UT, type: url-test, url: "{URL}", tolerance: 50, reliability: 90, delay-samples: 3, include-all: true, lazy: false}}"""
+    run.start(ports, nodes, groups, interval=12, timeout=2000, rules="MATCH,UT")
+    assert run.wait_now("UT", "a", 30), "UT did not settle on a"
+    time.sleep(26)  # three results per node
+    run.log("a: one check 300 ms slower (340 ms), then back to 40 ms")
+    sim_set({"20001": {"spike_next": 1, "spike_ms": 300}})
+    spike = run.watch(["UT"], 26)
+    run.log("a: 300 ms for good")
+    sim_set({"20001": {"latency": 300}})
+    t = time.time()
+    left = run.wait_now("UT", "b", 45)
+    run.result = {"spike_changes": spike[1:], "slow_left_after_s": round(time.time() - t, 1) if left else None,
+                  "final_UT": run.now("UT")}
+    run.result["fixed"] = len(spike) == 1 and left
+
+
+# ---- S8: a fast node that fails every third check (url-test reliability) -----
+def s8(run):
+    ports = {20001: {**ok(30), "fail_every": 3}, 20002: ok(90)}
+    nodes = [("flaky", 20001), ("steady", 20002)]
+    groups = f"""  - {{name: UT, type: url-test, url: "{URL}", tolerance: 30, reliability: 90, delay-samples: 3, max-failed-times: 3, include-all: true, lazy: false}}"""
+    run.start(ports, nodes, groups, interval=5, timeout=1000, rules="MATCH,UT")
+    results, lock = [], threading.Lock()
+
+    def request():
+        code = run.curl()
+        with lock:
+            results.append(code)
+
+    changes, last, on_flaky = [], None, 0
+    end = time.time() + 90
+    next_traffic = time.time()
+    while time.time() < end:
+        if time.time() >= next_traffic:
+            threading.Thread(target=request, daemon=True).start()
+            next_traffic += 1
+        n = run.now("UT")
+        on_flaky += n == "flaky"
+        if n != last:
+            last = n
+            changes.append((round(time.time() - run.t0, 2), n))
+            run.log(f"UT.now = {n}")
+        time.sleep(0.25)
+    time.sleep(4)
+    with lock:
+        failed = sum(code != "204" for code in results)
+        total = len(results)
+    polls = 90 / 0.25
+    run.result = {"switches": len(changes) - 1, "share_on_flaky": round(on_flaky / polls, 2),
+                  "requests": total, "failed_requests": failed, "changes": changes[:12]}
+    run.result["fixed"] = len(changes) <= 3
+
+
+# ---- S9: a fallback member fails one check, then fails for real (fail-confirm)
+def s9(run):
+    ports = {20001: ok(50), 20101: ok(80)}
+    nodes = [("u1", 20001), ("b1", 20101)]
+    groups = f"""  - {{name: UT, type: url-test, url: "{URL}", tolerance: 50, include-all: true, filter: '^u', lazy: false}}
+  - {{name: BK, type: url-test, url: "{URL}", tolerance: 50, include-all: true, filter: '^b', lazy: false}}
+  - {{name: FB, type: fallback, proxies: [UT, BK], url: "{URL}", expected-status: 204, interval: 3, timeout: 1000, fail-confirm: true, lazy: false}}"""
+    run.start(ports, nodes, groups, interval=120, timeout=1000)
+    assert run.wait_now("FB", "UT", 20), "FB did not settle on UT"
+    time.sleep(7)
+    single = []
+    for i in range(3):
+        run.log(f"A{i + 1}: the next connection through u1 times out once")
+        sim_set({"20001": {"fail_next": 1}})
+        single += run.watch(["FB"], 7, step=0.1)[1:]
+    away = [c for c in single if c[2] != "UT"]
+    run.log("B: u1 hangs for good")
+    sim_set({"20001": {"mode": "hang"}})
+    t = time.time()
+    left = run.wait_now("FB", "BK", 20)
+    left_after = round(time.time() - t, 1)
+    run.log("C: u1 works again")
+    sim_set({"20001": {"mode": "ok"}})
+    t = time.time()
+    back = run.wait_now("FB", "UT", 20)
+    run.result = {"single_failure_switches": len(away), "single_changes": single,
+                  "dead_left_after_s": left_after if left else None,
+                  "back_after_s": round(time.time() - t, 1) if back else None,
+                  "confirm_lines": diag_count(run, " fallback-confirm ")}
+    run.result["fixed"] = not away and left and back
+
+
+SCENARIOS = {"S1": s1, "S2": s2, "S3": s3, "S4": s4, "S5": s5, "S6": s6, "S7": s7, "S8": s8, "S9": s9}
 
 if __name__ == "__main__":
     binary, build, out_dir = sys.argv[1:4]

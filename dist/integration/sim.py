@@ -4,6 +4,10 @@
 * every listening port is one SOCKS5 "node" with its own, runtime adjustable
   behaviour: response latency, CONNECT delay and mode
   (ok | hang | close | down);
+* one-off and periodic faults per port, counted in accepted connections:
+  fail_next: N fails the next N connections, fail_every: K every K-th one
+  (fail_mode: hang | close, hang by default: a timeout, as on a real node);
+  spike_next: N adds spike_ms to the latency of the next N connections;
 * an HTTP server that answers 204 to every request (keep-alive), used as the
   health-check target and as the target for test traffic;
 * a control API: POST /ports {"<port>": {...}, ...} merges settings,
@@ -20,7 +24,8 @@ from collections import defaultdict
 PORTS = {}            # port -> {"latency": ms, "connect_delay": ms, "mode": str}
 SERVERS = {}          # port -> asyncio.Server
 STATS = defaultdict(int)
-DEFAULT = {"latency": 0, "connect_delay": 0, "mode": "ok"}
+DEFAULT = {"latency": 0, "connect_delay": 0, "mode": "ok",
+           "fail_next": 0, "fail_every": 0, "fail_mode": "hang", "spike_next": 0, "spike_ms": 0}
 
 
 async def pipe(reader, writer, latency_of=None):
@@ -47,11 +52,21 @@ async def pipe(reader, writer, latency_of=None):
 async def handle_socks(reader, writer, port):
     STATS[str(port)] += 1
     cfg = PORTS[port]
+    mode = cfg["mode"]
+    if cfg["fail_next"] > 0:
+        cfg["fail_next"] -= 1
+        mode = cfg["fail_mode"]
+    elif cfg["fail_every"] and STATS[str(port)] % cfg["fail_every"] == 0:
+        mode = cfg["fail_mode"]
+    spike = 0
+    if cfg["spike_next"] > 0:
+        cfg["spike_next"] -= 1
+        spike = cfg["spike_ms"]
     try:
-        if cfg["mode"] == "close":
+        if mode == "close":
             writer.close()
             return
-        if cfg["mode"] == "hang":  # accepts TCP, never answers
+        if mode == "hang":  # accepts TCP, never answers
             await asyncio.sleep(3600)
             return
         head = await reader.readexactly(2)
@@ -81,7 +96,7 @@ async def handle_socks(reader, writer, port):
         await writer.drain()
         await asyncio.gather(
             pipe(reader, tw),
-            pipe(tr, writer, lambda: PORTS[port]["latency"]),
+            pipe(tr, writer, lambda: PORTS[port]["latency"] + spike),
         )
     except (ConnectionError, asyncio.IncompleteReadError, OSError):
         try:
