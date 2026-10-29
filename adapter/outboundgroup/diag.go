@@ -85,14 +85,6 @@ func (u *URLTest) diagUnavailable(current C.Proxy) string {
 	}
 }
 
-// diagSlower says why url-test leaves a node that was judged by ref.
-func diagSlower(ref C.Proxy, testUrl string) string {
-	if !ref.AliveForTestUrl(testUrl) {
-		return "last-result-dead"
-	}
-	return "slower"
-}
-
 // diagKeep says whether url-test keeps its node on its own result or on the previous object's.
 func diagKeep(ref, current C.Proxy) string {
 	if ref != current {
@@ -102,10 +94,14 @@ func diagKeep(ref, current C.Proxy) string {
 }
 
 // diagPick logs a url-test decision when the node or the pending state changes,
-// and returns picked. ref is the object the old node was judged by, best the fastest one.
-func (u *URLTest) diagPick(picked C.Proxy, reason string, ref, best C.Proxy, minDelay uint16) C.Proxy {
+// and returns picked. ref is the object the old node was judged by, best the best one.
+func (u *URLTest) diagPick(picked C.Proxy, reason string, ref, best C.Proxy, bestRating rating) C.Proxy {
 	if !diag.Enabled() {
 		return picked
+	}
+	var refRating rating
+	if ref != nil {
+		refRating = u.rate(ref)
 	}
 	st := &u.diagSt
 	st.mu.Lock()
@@ -114,30 +110,56 @@ func (u *URLTest) diagPick(picked C.Proxy, reason string, ref, best C.Proxy, min
 	st.last, st.reason, st.at = picked.Name(), reason, time.Now()
 	st.refDelay = 0
 	if reason == "pending" && ref != nil {
-		st.refDelay = ref.LastDelayForTestUrl(u.testUrl)
+		st.refDelay = refRating.delay
 	}
 	if from == picked.Name() && (fromReason == "pending") == (reason == "pending") {
 		return picked
 	}
 	refDelay, bestName := "-", ""
 	if ref != nil {
-		refDelay = diag.Delay(ref.LastDelayForTestUrl(u.testUrl))
+		refDelay = diag.Delay(refRating.delay)
 	}
 	if best != nil {
 		bestName = best.Name()
 	}
-	diag.Log("url-test", "group=%q from=%q to=%q reason=%s from_delay=%s to_delay=%s best=%q best_delay=%s tol=%d",
-		u.Name(), from, picked.Name(), reason, refDelay, diag.Delay(picked.LastDelayForTestUrl(u.testUrl)),
-		bestName, diag.Delay(minDelay), u.tolerance)
+	pickedRating := u.rate(picked)
+	checks := ""
+	if u.rated() {
+		checks = fmt.Sprintf(" from_ok=%s to_ok=%s best_ok=%s from_last=%s", refRating.checks(ref != nil), pickedRating.checks(true),
+			bestRating.checks(best != nil), diag.Delay(lastDelay(ref, u.testUrl)))
+	}
+	diag.Log("url-test", "group=%q from=%q to=%q reason=%s from_delay=%s to_delay=%s best=%q best_delay=%s tol=%d%s",
+		u.Name(), from, picked.Name(), reason, refDelay, diag.Delay(pickedRating.delay),
+		bestName, diag.Delay(bestRating.delay), u.tolerance, checks)
 	return picked
+}
+
+// rated reports whether url-test looks beyond the last check (reliability or delay-samples).
+func (u *URLTest) rated() bool {
+	return u.reliability > 0 || u.delaySamples > 1
+}
+
+// checks formats the share of successful checks: "9/10", "-" when unknown.
+func (r rating) checks(known bool) string {
+	if !known || r.n == 0 {
+		return "-"
+	}
+	return strconv.Itoa(r.ok) + "/" + strconv.Itoa(r.n)
+}
+
+func lastDelay(p C.Proxy, testUrl string) uint16 {
+	if p == nil {
+		return 0xffff
+	}
+	return p.LastDelayForTestUrl(testUrl)
 }
 
 // DiagStatus returns the status line of the group for the diagnostic log.
 func (u *URLTest) DiagStatus() string {
 	now := u.fast(false)
-	var alive, dead, untested int
+	var alive, dead, untested, unreliable int
 	var best C.Proxy
-	bestDelay := 0xffff
+	var bestRating rating
 	stale := true // now is an object the provider has replaced (url-test caches its pick for 10 s)
 	proxies := u.GetProxies(false)
 	for _, p := range proxies {
@@ -149,8 +171,12 @@ func (u *URLTest) DiagStatus() string {
 			untested++
 		case p.AliveForTestUrl(u.testUrl):
 			alive++
-			if d := int(p.LastDelayForTestUrl(u.testUrl)); d < bestDelay {
-				best, bestDelay = p, d
+			r := u.rate(p)
+			if !r.reliable {
+				unreliable++
+			}
+			if best == nil || r.better(bestRating) {
+				best, bestRating = p, r
 			}
 		default:
 			dead++
@@ -165,10 +191,15 @@ func (u *URLTest) DiagStatus() string {
 	if !at.IsZero() {
 		decided = strconv.Itoa(int(time.Since(at).Seconds())) + "s"
 	}
-	nowDelay := int(now.LastDelayForTestUrl(u.testUrl))
+	nowRating := u.rate(now)
+	nowDelay := int(nowRating.delay)
 	extra := ""
+	if u.rated() {
+		extra = fmt.Sprintf(" ok=%s last=%s best_ok=%s unreliable=%d", nowRating.checks(true),
+			diag.Delay(now.LastDelayForTestUrl(u.testUrl)), bestRating.checks(best != nil), unreliable)
+	}
 	if reason == "pending" && !hasTestResult(now, u.testUrl) {
-		extra = " pending_prev_delay=" + diag.Delay(refDelay)
+		extra += " pending_prev_delay=" + diag.Delay(refDelay)
 	}
 	empty := now == u.EmptyFallback()
 	switch {
@@ -183,14 +214,21 @@ func (u *URLTest) DiagStatus() string {
 		extra += " stale_object=true"
 	}
 	bestName, delta := "", "-"
+	bestDelay := 0xffff
 	if best != nil {
-		bestName = best.Name()
+		bestName, bestDelay = best.Name(), int(bestRating.delay)
 		if nowDelay < 0xffff && !stale {
 			d := nowDelay - bestDelay
 			delta = strconv.Itoa(d)
-			if d > int(u.tolerance) && u.selected == "" {
-				diag.Warn("url-test %s: %q is %d ms slower than %q (%d vs %d ms, tolerance %d, decided %s ago)",
-					u.Name(), now.Name(), d, bestName, nowDelay, bestDelay, u.tolerance, decided)
+			if u.selected == "" {
+				switch {
+				case bestRating.reliable && !nowRating.reliable && hasTestResult(now, u.testUrl):
+					diag.Warn("url-test %s: %q is unreliable (%s checks ok, needs %d%%) while %q is reliable (decided %s ago)",
+						u.Name(), now.Name(), nowRating.checks(true), u.reliability, bestName, decided)
+				case d > int(u.tolerance):
+					diag.Warn("url-test %s: %q is %d ms slower than %q (%d vs %d ms, tolerance %d, decided %s ago)",
+						u.Name(), now.Name(), d, bestName, nowDelay, bestDelay, u.tolerance, decided)
+				}
 			}
 		}
 	}
@@ -201,8 +239,8 @@ func (u *URLTest) DiagStatus() string {
 
 // DiagConfig describes the group for the diagnostic log.
 func (u *URLTest) DiagConfig() string {
-	return fmt.Sprintf("url-test=%q url=%s expected=%q tolerance=%d max_failed=%d timeout=%d providers=%s members=%d",
-		u.Name(), u.testUrl, u.expectedStatus, u.tolerance, u.maxFailedTimes, u.testTimeout, u.diagProviders(), len(u.GetProxies(false)))
+	return fmt.Sprintf("url-test=%q url=%s expected=%q tolerance=%d reliability=%d delay_samples=%d max_failed=%d timeout=%d providers=%s members=%d",
+		u.Name(), u.testUrl, u.expectedStatus, u.tolerance, u.reliability, u.delaySamples, u.maxFailedTimes, u.testTimeout, u.diagProviders(), len(u.GetProxies(false)))
 }
 
 // diagNote logs a fallback switch and returns picked.

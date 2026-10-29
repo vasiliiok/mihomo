@@ -214,3 +214,127 @@ func TestURLTestLeavesRecreatedProxyThatWasDead(t *testing.T) {
 	require.Same(t, next[0], group.fast(false),
 		"url-test kept a recreated proxy whose last result was a failure")
 }
+
+// fakeHistoryProxy is a proxy with a health check history for testUrl; a zero
+// delay is a failed check. Like adapter.Proxy, the last check decides alive.
+type fakeHistoryProxy struct {
+	C.Proxy
+	name    string
+	history []C.DelayHistory
+}
+
+func historyProxy(name string, delays ...uint16) *fakeHistoryProxy {
+	p := &fakeHistoryProxy{Proxy: adapter.NewProxy(outbound.NewDirect()), name: name}
+	for _, d := range delays {
+		p.history = append(p.history, C.DelayHistory{Delay: d})
+	}
+	return p
+}
+
+func (p *fakeHistoryProxy) Name() string { return p.name }
+
+func (p *fakeHistoryProxy) AliveForTestUrl(string) bool {
+	return len(p.history) == 0 || p.history[len(p.history)-1].Delay > 0
+}
+
+func (p *fakeHistoryProxy) LastDelayForTestUrl(string) uint16 {
+	if len(p.history) == 0 || p.history[len(p.history)-1].Delay == 0 {
+		return 0xffff
+	}
+	return p.history[len(p.history)-1].Delay
+}
+
+func (p *fakeHistoryProxy) ExtraDelayHistories() map[string]C.ProxyState {
+	if len(p.history) == 0 {
+		return map[string]C.ProxyState{}
+	}
+	return map[string]C.ProxyState{testUrl: {Alive: p.AliveForTestUrl(testUrl), History: p.history}}
+}
+
+func newRatedURLTest(t *testing.T, pd P.ProxyProvider, opt URLTestOption) *URLTest {
+	t.Helper()
+	group, err := NewURLTest(GroupCommonOption{Name: "url-test", URL: testUrl}, opt, adapter.NewProxy(outbound.NewDirect()), []P.ProxyProvider{pd})
+	require.NoError(t, err)
+	return group
+}
+
+func TestURLTestDelaySamplesIgnoreSingleSpike(t *testing.T) {
+	fast := historyProxy("fast", 60, 65, 60)
+	steady := historyProxy("steady", 150, 150, 150)
+	for _, samples := range []int{0, 3} {
+		pd := &fakeProxyProvider{}
+		pd.update([]C.Proxy{steady, fast})
+		group := newRatedURLTest(t, pd, URLTestOption{Tolerance: 80, DelaySamples: samples})
+		require.Same(t, fast, group.fast(false))
+
+		// one check of the selected node is slow
+		fast.history = append(fast.history, C.DelayHistory{Delay: 310})
+		group.fastSingle.Reset()
+		if samples == 0 {
+			require.Same(t, steady, group.fast(false), "without delay-samples the last delay decides")
+		} else {
+			require.Same(t, fast, group.fast(false), "a single slow check moved the group off its node")
+		}
+		fast.history = fast.history[:3]
+	}
+
+	// a node that stays slow is left: the median follows it after two checks
+	fast.history = append(fast.history, C.DelayHistory{Delay: 310}, C.DelayHistory{Delay: 320})
+	pd := &fakeProxyProvider{}
+	pd.update([]C.Proxy{steady, fast})
+	group := newRatedURLTest(t, pd, URLTestOption{Tolerance: 80, DelaySamples: 3})
+	group.fastNode = fast
+	require.Same(t, steady, group.fast(false), "the median did not follow a node that became slow")
+}
+
+func TestURLTestPrefersReliableProxies(t *testing.T) {
+	flaky := historyProxy("flaky", 50, 0, 50, 50, 0, 50, 50, 50, 0, 50) // 7 of 10
+	sound := historyProxy("sound", 120, 120, 120, 120, 120, 120, 120, 120, 120, 120)
+	pd := &fakeProxyProvider{}
+	pd.update([]C.Proxy{flaky, sound})
+
+	group := newRatedURLTest(t, pd, URLTestOption{Tolerance: 80})
+	require.Same(t, flaky, group.fast(false), "without reliability the lowest delay wins")
+
+	group = newRatedURLTest(t, pd, URLTestOption{Tolerance: 80, Reliability: 90})
+	require.Same(t, sound, group.fast(false), "an unreliable node was preferred to a reliable one")
+
+	// the selected node fails a second check of ten: it becomes unreliable and is left
+	// even though its delay is within the tolerance
+	near := historyProxy("near", 100, 0, 100, 100, 100, 100, 100, 100, 100, 100)
+	pd.update([]C.Proxy{near, sound})
+	group = newRatedURLTest(t, pd, URLTestOption{Tolerance: 80, Reliability: 90})
+	require.Same(t, near, group.fast(false), "one failure in ten is within reliability 90")
+	near.history = historyProxy("", 100, 0, 100, 100, 100, 100, 100, 0, 100, 100).history
+	group.fastSingle.Reset()
+	require.Same(t, sound, group.fast(false), "the group kept a node that became unreliable")
+}
+
+func TestURLTestWithoutReliableProxiesPicksTheFastest(t *testing.T) {
+	a := historyProxy("a", 50, 0, 50, 0, 50)
+	b := historyProxy("b", 0, 0, 90, 90, 90)
+	pd := &fakeProxyProvider{}
+	pd.update([]C.Proxy{b, a})
+	group := newRatedURLTest(t, pd, URLTestOption{Tolerance: 10, Reliability: 90})
+	require.Same(t, a, group.fast(false))
+}
+
+func TestURLTestReliabilityDoesNotPreferUntested(t *testing.T) {
+	untested := historyProxy("untested")
+	tested := historyProxy("tested", 0, 200, 200) // 2 of 3: unreliable
+	pd := &fakeProxyProvider{}
+	pd.update([]C.Proxy{untested, tested})
+	group := newRatedURLTest(t, pd, URLTestOption{Reliability: 90})
+	require.Same(t, tested, group.fast(false), "an untested node was preferred to a tested alive one")
+}
+
+func TestURLTestClampsRatingOptions(t *testing.T) {
+	pd := &fakeProxyProvider{}
+	pd.update(delayProxies(10))
+	group := newRatedURLTest(t, pd, URLTestOption{Reliability: 150, DelaySamples: 50})
+	require.Equal(t, 100, group.reliability)
+	require.Equal(t, 10, group.delaySamples)
+	group = newRatedURLTest(t, pd, URLTestOption{Reliability: -5, DelaySamples: -1})
+	require.Equal(t, 0, group.reliability)
+	require.Equal(t, 0, group.delaySamples)
+}

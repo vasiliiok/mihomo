@@ -137,3 +137,26 @@ func TestURLTestDiagMarksLoadedAndStale(t *testing.T) {
 	require.Contains(t, status, "stale_object=true")
 	require.Empty(t, grep(lines(), " warn ", "slower than"), "a cached replaced object must not raise a delta warning")
 }
+
+func TestURLTestDiagLogsReliability(t *testing.T) {
+	lines := diagLines(t)
+	near := historyProxy("near", 100, 100, 100, 100, 100, 100, 100, 100, 0, 100)
+	sound := historyProxy("sound", 120, 120, 120, 120, 120, 120, 120, 120, 120, 120)
+	pd := &fakeProxyProvider{}
+	pd.update([]C.Proxy{near, sound})
+	group := newRatedURLTest(t, pd, URLTestOption{Tolerance: 80, Reliability: 90, DelaySamples: 3})
+	require.Same(t, near, group.fast(false))
+
+	near.history = historyProxy("", 100, 100, 100, 100, 100, 100, 0, 100, 0, 300).history
+	group.fastSingle.Reset()
+	require.Same(t, sound, group.fast(false))
+	require.Contains(t, group.DiagConfig(), "tolerance=80 reliability=90 delay_samples=3 ")
+	status := group.DiagStatus()
+	require.Contains(t, status, `now="sound" delay=120 best="sound" best_delay=120 delta=0`)
+	require.Contains(t, status, "ok=10/10 last=120 best_ok=10/10 unreliable=1")
+
+	got := grep(lines(), " url-test ")
+	require.Len(t, got, 2, strings.Join(got, "\n"))
+	require.Contains(t, got[0], `to="near" reason=first`)
+	require.Contains(t, got[1], `from="near" to="sound" reason=unreliable from_delay=100 to_delay=120 best="sound" best_delay=120 tol=80 from_ok=8/10 to_ok=10/10 best_ok=10/10 from_last=300`)
+}
