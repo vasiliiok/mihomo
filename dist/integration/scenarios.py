@@ -462,7 +462,8 @@ def s8(run):
             changes.append((round(time.time() - run.t0, 2), n))
             run.log(f"UT.now = {n}")
         time.sleep(0.25)
-    checks = [h["delay"] for h in api("/proxies/flaky")["extra"].get(URL, {}).get("history", [])]
+    flaky = [p for p in api("/providers/proxies/sim")["proxies"] if p["name"] == "flaky"][0]
+    checks = [h["delay"] for h in flaky.get("extra", {}).get(URL, {}).get("history", [])]
     run.result = {"switches": len(changes) - 1, "share_on_flaky": round(on_flaky / polls, 2),
                   "flaky_last_checks": checks, "changes": changes[:12]}
     run.result["fixed"] = len(changes) <= 3
