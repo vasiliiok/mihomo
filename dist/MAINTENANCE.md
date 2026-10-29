@@ -15,6 +15,7 @@
 | `c8c4d5ed` fix(provider): keep the health check history of unchanged nodes on update | новый объект узла получает историю старого (те же имя, тип, адрес) — `adapter.Proxy.InheritHealth`, `provider.inheritHealth` | upstream перестанет обнулять историю при обновлении подписки |
 | `4897c063` feat(url-test): reliability and delay-samples options | параметры групп `reliability`, `delay-samples` (`rate`/`better` в `urltest.go`) | upstream добавит учёт надёжности/сглаживание; **в конфиге параметры останутся, официальная сборка их молча игнорирует** |
 | `48e3610b` feat(fallback): fail-confirm option | параметр `fail-confirm`: участник мёртв только после проваленной повторной проверки | upstream добавит подтверждение отказа; то же про конфиг |
+| `b42c8782` fix: prevent SOCKS domain length arithmetic overflow (#3359) | cherry-pick upstream `6780eeeb` (ещё не в релизе): имя длиной 254–255 байт в SOCKS/HTTP-запросе роняло процесс (`slice bounds out of range`, без recover) | придёт с релизом, содержащим `6780eeeb`; при merge тега изменение совпадёт и уйдёт само |
 | `01015d7f` fix(diag): count connections after the handshake, health checks apart | счётчики журнала: `dial_ok` после рукопожатия, `hc_ok`/`hc_fail`, `alloc`, `new_conns` (`statistic.Manager.Joined`) | часть журнала, оставляем |
 
 Регрессионные тесты правок: `adapter/outboundgroup/urltest_test.go`, `adapter/outboundgroup/fallback_test.go`,
