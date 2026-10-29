@@ -521,21 +521,36 @@ pct enter 101
 # в контейнере
 /usr/local/bin/mihomo.new -v
 cd /etc/mihomo && cp -p config.yaml config.yaml.prev
-# новые параметры: url-test — reliability: 90, delay-samples: 3; fallback — fail-confirm: true
-sed -i '/type: url-test/{/reliability:/!s/tolerance: 80, /tolerance: 80, reliability: 90, delay-samples: 3, /}' config.yaml
-sed -i '/type: fallback/{/fail-confirm:/!s/interval: 60, /interval: 60, fail-confirm: true, /}' config.yaml
-grep -c 'reliability: 90, delay-samples: 3' config.yaml   # должно быть 5 (все url-test группы)
-grep -c 'fail-confirm: true' config.yaml                  # должно быть 4 (все fallback группы)
-diff config.yaml.prev config.yaml
+# положить новый config.yaml (или дописать параметры вручную, см. ниже), затем:
+grep -c 'reliability: 90' config.yaml    # должно быть 5 (все url-test группы)
+grep -c 'fail-confirm: true' config.yaml # должно быть 4 (все fallback группы)
+diff config.yaml.prev config.yaml        # только эти 14 строк
 /usr/local/bin/mihomo.new -d /etc/mihomo -t
 cp -p /usr/local/bin/mihomo /usr/local/bin/mihomo.prev
 mv -f /usr/local/bin/mihomo.new /usr/local/bin/mihomo
 systemctl restart mihomo && systemctl status mihomo --no-pager -n 20 && mihomo -v
 ```
 
-`sed` рассчитан на группы в одну строку, как в вашем конфиге (`- {name: …, type: url-test, …, tolerance: 80, …}`).
-Если счётчики показали не 5 и 4, допишите параметры вручную в нужные группы: в url-test —
-`reliability: 90, delay-samples: 3`, в fallback — `fail-confirm: true`.
+Что дописать в конфиг (группы у вас записаны блоками): в каждую url-test-группу после `tolerance: 80` —
+две строки, в каждую fallback-группу после `interval: 60` — одну, с тем же отступом:
+
+```yaml
+  - name: PROXY-NON-RU
+    type: url-test
+    tolerance: 80
+    reliability: 90
+    delay-samples: 3
+    ...
+  - name: NON-RU-FIRST
+    type: fallback
+    ...
+    interval: 60
+    fail-confirm: true
+    ...
+```
+
+Готовый конфиг с этими 14 строками я прислал отдельно (в репозиторий он не попадает: в нём `secret` и ссылка
+подписки); он проходит `-t` и на urltestfix5, и на официальной v1.19.33.
 
 * Откат бинарника: `cp -p /usr/local/bin/mihomo.prev /usr/local/bin/mihomo.tmp && mv -f /usr/local/bin/mihomo.tmp /usr/local/bin/mihomo && systemctl restart mihomo`
   (поверх работающего файла писать нельзя — Text file busy, поэтому копия + `mv`). Конфиг с новыми
