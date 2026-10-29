@@ -256,30 +256,51 @@ func (f *Fallback) diagNote(picked C.Proxy) C.Proxy {
 	st.mu.Unlock()
 	if changed {
 		diag.Log("fallback", "group=%q from=%q to=%q fixed=%q members=%s",
-			f.Name(), from, picked.Name(), f.selected, diagMembers(f.GetProxies(false), f.testUrl))
+			f.Name(), from, picked.Name(), f.selected, f.diagMembers())
 	}
 	return picked
 }
 
 // diagMembers lists the members with their state for testUrl.
-func diagMembers(proxies []C.Proxy, testUrl string) string {
+func (f *Fallback) diagMembers() string {
 	var b strings.Builder
 	b.WriteByte('[')
-	for i, p := range proxies {
+	for i, p := range f.GetProxies(false) {
 		if i > 0 {
 			b.WriteByte(' ')
 		}
 		state := "dead"
+		alive, suspect := f.memberState(p)
 		switch {
-		case !hasTestResult(p, testUrl):
+		case !hasTestResult(p, f.testUrl):
 			state = "untested"
-		case p.AliveForTestUrl(testUrl):
-			state = diag.Delay(p.LastDelayForTestUrl(testUrl))
+		case suspect:
+			state = "suspect" // the last check failed, a re-check will tell
+		case alive:
+			state = diag.Delay(p.LastDelayForTestUrl(f.testUrl))
 		}
 		b.WriteString(strconv.Quote(p.Name()) + ":" + state)
 	}
 	b.WriteByte(']')
 	return b.String()
+}
+
+// diagConfirmed logs the result of re-checking a member whose check had failed.
+func (f *Fallback) diagConfirmed(p C.Proxy, failed bool, delay uint16, err error, failedCheck time.Time) {
+	if !diag.Enabled() {
+		return
+	}
+	result, msg := "alive", ""
+	if failed {
+		result = "dead"
+		if err != nil {
+			msg = fmt.Sprintf(" err=%q", diag.Err(err))
+		}
+	} else {
+		msg = " delay=" + diag.Delay(delay)
+	}
+	diag.Log("fallback-confirm", "group=%q member=%q result=%s after=%dms%s",
+		f.Name(), p.Name(), result, time.Since(failedCheck).Milliseconds(), msg)
 }
 
 // diagChain follows the picks of nested groups: "A → B → node", and returns the
@@ -311,7 +332,7 @@ func (f *Fallback) DiagStatus() string {
 	now := f.findAliveProxy(false)
 	chain, leafDelay := diagChain(now, f.testUrl)
 	return fmt.Sprintf("fallback=%q now=%q chain=%s leaf_delay=%s fixed=%q members=%s %s",
-		f.Name(), now.Name(), chain, leafDelay, f.selected, diagMembers(f.GetProxies(false), f.testUrl), f.diagDials())
+		f.Name(), now.Name(), chain, leafDelay, f.selected, f.diagMembers(), f.diagDials())
 }
 
 // DiagConfig describes the group for the diagnostic log.
@@ -320,6 +341,6 @@ func (f *Fallback) DiagConfig() string {
 	for _, p := range f.GetProxies(false) {
 		names = append(names, strconv.Quote(p.Name()))
 	}
-	return fmt.Sprintf("fallback=%q url=%s expected=%q max_failed=%d timeout=%d providers=%s members=[%s]",
-		f.Name(), f.testUrl, f.expectedStatus, f.maxFailedTimes, f.testTimeout, f.diagProviders(), strings.Join(names, " "))
+	return fmt.Sprintf("fallback=%q url=%s expected=%q fail_confirm=%t max_failed=%d timeout=%d providers=%s members=[%s]",
+		f.Name(), f.testUrl, f.expectedStatus, f.failConfirm, f.maxFailedTimes, f.testTimeout, f.diagProviders(), strings.Join(names, " "))
 }

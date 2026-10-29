@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/metacubex/mihomo/adapter"
 	"github.com/metacubex/mihomo/adapter/outbound"
@@ -159,4 +160,21 @@ func TestURLTestDiagLogsReliability(t *testing.T) {
 	require.Len(t, got, 2, strings.Join(got, "\n"))
 	require.Contains(t, got[0], `to="near" reason=first`)
 	require.Contains(t, got[1], `from="near" to="sound" reason=unreliable from_delay=100 to_delay=120 best="sound" best_delay=120 tol=80 from_ok=8/10 to_ok=10/10 best_ok=10/10 from_last=300`)
+}
+
+func TestFallbackDiagLogsConfirmation(t *testing.T) {
+	lines := diagLines(t)
+	main, spare := historyProxy("main", 80), historyProxy("spare", 90)
+	main.results = []uint16{0}
+	group := newTestFallback(t, true, main, spare)
+	require.Contains(t, group.DiagConfig(), " fail_confirm=true ")
+
+	main.check(0)
+	require.Contains(t, group.DiagStatus(), `members=["main":suspect "spare":90]`)
+	require.Eventually(t, func() bool { return len(grep(lines(), " fallback-confirm ")) == 1 }, 3*time.Second, 10*time.Millisecond)
+	require.Contains(t, group.DiagStatus(), `now="spare"`)
+	got := grep(lines(), " fallback-confirm ")
+	require.Contains(t, got[0], `group="fallback" member="main" result=dead after=`)
+	require.Contains(t, got[0], `err="timeout"`)
+	require.Contains(t, grep(lines(), " fallback ")[1], `from="main" to="spare" fixed="" members=["main":dead "spare":90]`)
 }

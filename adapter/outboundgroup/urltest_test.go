@@ -1,8 +1,12 @@
 package outboundgroup
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/metacubex/mihomo/adapter"
 	"github.com/metacubex/mihomo/adapter/outbound"
@@ -217,10 +221,14 @@ func TestURLTestLeavesRecreatedProxyThatWasDead(t *testing.T) {
 
 // fakeHistoryProxy is a proxy with a health check history for testUrl; a zero
 // delay is a failed check. Like adapter.Proxy, the last check decides alive.
+// URLTest records the next of the scripted results.
 type fakeHistoryProxy struct {
 	C.Proxy
 	name    string
+	mu      sync.Mutex
 	history []C.DelayHistory
+	results []uint16 // what URLTest will measure, 0 = fail
+	tests   int
 }
 
 func historyProxy(name string, delays ...uint16) *fakeHistoryProxy {
@@ -234,10 +242,14 @@ func historyProxy(name string, delays ...uint16) *fakeHistoryProxy {
 func (p *fakeHistoryProxy) Name() string { return p.name }
 
 func (p *fakeHistoryProxy) AliveForTestUrl(string) bool {
+	p.mu.Lock()
+	defer p.mu.Unlock()
 	return len(p.history) == 0 || p.history[len(p.history)-1].Delay > 0
 }
 
 func (p *fakeHistoryProxy) LastDelayForTestUrl(string) uint16 {
+	p.mu.Lock()
+	defer p.mu.Unlock()
 	if len(p.history) == 0 || p.history[len(p.history)-1].Delay == 0 {
 		return 0xffff
 	}
@@ -245,10 +257,41 @@ func (p *fakeHistoryProxy) LastDelayForTestUrl(string) uint16 {
 }
 
 func (p *fakeHistoryProxy) ExtraDelayHistories() map[string]C.ProxyState {
+	alive := p.AliveForTestUrl(testUrl)
+	p.mu.Lock()
+	defer p.mu.Unlock()
 	if len(p.history) == 0 {
 		return map[string]C.ProxyState{}
 	}
-	return map[string]C.ProxyState{testUrl: {Alive: p.AliveForTestUrl(testUrl), History: p.history}}
+	return map[string]C.ProxyState{testUrl: {Alive: alive, History: append([]C.DelayHistory(nil), p.history...)}}
+}
+
+// check records a health check result, as a provider round would.
+func (p *fakeHistoryProxy) check(delay uint16) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.history = append(p.history, C.DelayHistory{Time: time.Now(), Delay: delay})
+}
+
+func (p *fakeHistoryProxy) URLTest(context.Context, string, utils.IntRanges[uint16]) (uint16, error) {
+	p.mu.Lock()
+	var delay uint16
+	if len(p.results) > 0 {
+		delay, p.results = p.results[0], p.results[1:]
+	}
+	p.tests++
+	p.mu.Unlock()
+	p.check(delay)
+	if delay == 0 {
+		return 0, errors.New("timeout")
+	}
+	return delay, nil
+}
+
+func (p *fakeHistoryProxy) testCount() int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return p.tests
 }
 
 func newRatedURLTest(t *testing.T, pd P.ProxyProvider, opt URLTestOption) *URLTest {
