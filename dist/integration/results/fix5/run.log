@@ -1,0 +1,158 @@
+  S1/v4 [   0.06s] mihomo started: {'meta': True, 'version': 'sim-v4b'}
+  S1/v4 [  10.14s] UT settled on n3 (40 ms); moving n3 to port 21003 (400 ms), old port 20003 keeps working
+  S1/v4 [  10.15s] UT.now = n3
+  S1/v4 [  20.28s] UT.now = n2
+  S1/v4 [  22.26s] UT.now = n2
+  S2/v4 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v4b'}
+  S2/v4 [  31.32s] UT on sel (120 ms), FB on UT; recreating all nodes (comment in the file)
+  S2/v4 [  31.32s] UT.now = sel
+  S2/v4 [  31.32s] FB.now = UT
+  S3/v4 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v4b'}
+  S3/v4 [  10.96s] UT on n1 (first in list); n1 -> 110 ms, n2 -> 80 ms (better by 30 < tolerance 50)
+  S3/v4 [  10.96s] UT.now = n1
+  S3/v4 [  43.08s] n2 -> 40 ms (better by 70 > tolerance 50): every build must switch
+  S3/v4 [  43.08s] UT.now = n1
+  S3/v4 [  50.21s] UT.now = n2
+  S4/v4 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v4b'}
+  S4/v4 [   8.61s] startup check done: 51/51 tested
+  S4/v4 [  10.62s] manual health check started (takes ~8 s: 51 nodes, 10 at a time, 1.5 s handshake)
+  S4/v4 [  13.27s] provider reloaded in the middle of the check (log time 13.22s)
+  S5/v4 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v4b'}
+  S5/v4 [   0.05s] UT.now = COMPATIBLE
+  S5/v4 [   0.05s] BK.now = COMPATIBLE
+  S5/v4 [   0.06s] FB.now = UT
+  S5/v4 [  10.13s] UT.now = n2
+  S5/v4 [  10.13s] BK.now = b1
+  S5/v4 [  12.09s] A: n2 (selected) now hangs; waiting for a scheduled check
+  S5/v4 [  50.36s] B: n3 (selected) now closes connections; sending traffic
+  S5/v4 [  52.19s] C: all UT nodes hang
+  S5/v4 [  65.22s] C: UT nodes revived
+  S6/v4 [   0.06s] mihomo started: {'meta': True, 'version': 'sim-v4b'}
+  S6/v4 [   0.07s] ALL.now = <HTTPError>
+  S6/v4 [   0.07s] JP.now = <HTTPError>
+  S6/v4 [   0.17s] ALL.now = x1
+  S6/v4 [   0.17s] JP.now = j1
+  S6/v4 [  10.25s] ALL.now = j1
+  S7/v4 [   0.11s] mihomo started: {'meta': True, 'version': 'sim-v4b'}
+  S7/v4 [  26.11s] a: one check 300 ms slower (340 ms), then back to 40 ms
+  S7/v4 [  26.11s] UT.now = a
+  S7/v4 [  46.16s] UT.now = b
+  S7/v4 [  56.27s] a: 300 ms for good (UT back on a: True)
+  S8/v4 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v4b'}
+  S8/v4 [   0.06s] UT.now = flaky
+  S9/v4 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v4b'}
+  S9/v4 [   7.05s] A1: the next connection through u1 times out once
+  S9/v4 [   7.06s] FB.now = UT
+  S9/v4 [  10.10s] FB.now = BK
+  S9/v4 [  12.17s] FB.now = UT
+  S9/v4 [  14.11s] A2: the next connection through u1 times out once
+  S9/v4 [  14.11s] FB.now = UT
+  S9/v4 [  16.04s] FB.now = BK
+  S9/v4 [  18.18s] FB.now = UT
+  S9/v4 [  21.14s] A3: the next connection through u1 times out once
+  S9/v4 [  21.15s] FB.now = UT
+  S9/v4 [  25.11s] FB.now = BK
+  S9/v4 [  27.18s] FB.now = UT
+  S9/v4 [  28.19s] B: u1 hangs for good
+  S9/v4 [  31.22s] C: u1 works again
+  S1/v5 [   0.06s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S1/v5 [  10.21s] UT settled on n3 (40 ms); moving n3 to port 21003 (400 ms), old port 20003 keeps working
+  S1/v5 [  10.22s] UT.now = n3
+  S1/v5 [  20.26s] UT.now = n2
+  S1/v5 [  22.24s] UT.now = n2
+  S2/v5 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S2/v5 [  31.42s] UT on sel (120 ms), FB on UT; recreating all nodes (comment in the file)
+  S2/v5 [  31.42s] UT.now = sel
+  S2/v5 [  31.42s] FB.now = UT
+  S3/v5 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S3/v5 [  10.96s] UT on n1 (first in list); n1 -> 110 ms, n2 -> 80 ms (better by 30 < tolerance 50)
+  S3/v5 [  10.96s] UT.now = n1
+  S3/v5 [  43.06s] n2 -> 40 ms (better by 70 > tolerance 50): every build must switch
+  S3/v5 [  43.06s] UT.now = n1
+  S3/v5 [  50.19s] UT.now = n2
+  S4/v5 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S4/v5 [   8.61s] startup check done: 51/51 tested
+  S4/v5 [  10.61s] manual health check started (takes ~8 s: 51 nodes, 10 at a time, 1.5 s handshake)
+  S4/v5 [  13.27s] provider reloaded in the middle of the check (log time 13.22s)
+  S5/v5 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S5/v5 [   0.05s] UT.now = COMPATIBLE
+  S5/v5 [   0.06s] BK.now = COMPATIBLE
+  S5/v5 [   0.06s] FB.now = UT
+  S5/v5 [  10.05s] UT.now = n2
+  S5/v5 [  10.05s] BK.now = b1
+  S5/v5 [  12.14s] A: n2 (selected) now hangs; waiting for a scheduled check
+  S5/v5 [  50.41s] B: n3 (selected) now closes connections; sending traffic
+  S5/v5 [  52.22s] C: all UT nodes hang
+  S5/v5 [  65.13s] C: UT nodes revived
+  S6/v5 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S6/v5 [   0.05s] ALL.now = x1
+  S6/v5 [   0.06s] JP.now = j1
+  S6/v5 [  10.14s] ALL.now = j1
+  S7/v5 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S7/v5 [  26.05s] a: one check 300 ms slower (340 ms), then back to 40 ms
+  S7/v5 [  26.06s] UT.now = a
+  S7/v5 [  52.19s] a: 300 ms for good (UT back on a: True)
+  S8/v5 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S8/v5 [   0.05s] UT.now = flaky
+  S8/v5 [  20.18s] UT.now = steady
+  S9/v5 [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S9/v5 [   7.05s] A1: the next connection through u1 times out once
+  S9/v5 [   7.06s] FB.now = UT
+  S9/v5 [  14.08s] A2: the next connection through u1 times out once
+  S9/v5 [  14.08s] FB.now = UT
+  S9/v5 [  21.10s] A3: the next connection through u1 times out once
+  S9/v5 [  21.10s] FB.now = UT
+  S9/v5 [  28.12s] B: u1 hangs for good
+  S9/v5 [  33.20s] C: u1 works again
+  S1/v5diag [   0.06s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S1/v5diag [  10.16s] UT settled on n3 (40 ms); moving n3 to port 21003 (400 ms), old port 20003 keeps working
+  S1/v5diag [  10.17s] UT.now = n3
+  S1/v5diag [  20.10s] UT.now = n2
+  S1/v5diag [  22.23s] UT.now = n2
+  S2/v5diag [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S2/v5diag [  21.28s] UT on sel (120 ms), FB on UT; recreating all nodes (comment in the file)
+  S2/v5diag [  21.28s] UT.now = sel
+  S2/v5diag [  21.28s] FB.now = UT
+  S3/v5diag [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S3/v5diag [  10.96s] UT on n1 (first in list); n1 -> 110 ms, n2 -> 80 ms (better by 30 < tolerance 50)
+  S3/v5diag [  10.96s] UT.now = n1
+  S3/v5diag [  43.04s] n2 -> 40 ms (better by 70 > tolerance 50): every build must switch
+  S3/v5diag [  43.05s] UT.now = n1
+  S3/v5diag [  50.18s] UT.now = n2
+  S4/v5diag [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S4/v5diag [   8.61s] startup check done: 51/51 tested
+  S4/v5diag [  10.61s] manual health check started (takes ~8 s: 51 nodes, 10 at a time, 1.5 s handshake)
+  S4/v5diag [  13.26s] provider reloaded in the middle of the check (log time 13.22s)
+  S5/v5diag [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S5/v5diag [   0.05s] UT.now = COMPATIBLE
+  S5/v5diag [   0.05s] BK.now = COMPATIBLE
+  S5/v5diag [   0.06s] FB.now = UT
+  S5/v5diag [  10.13s] UT.now = n2
+  S5/v5diag [  10.13s] BK.now = b1
+  S5/v5diag [  12.15s] A: n2 (selected) now hangs; waiting for a scheduled check
+  S5/v5diag [  50.36s] B: n3 (selected) now closes connections; sending traffic
+  S5/v5diag [  52.17s] C: all UT nodes hang
+  S5/v5diag [  65.08s] C: UT nodes revived
+  S6/v5diag [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S6/v5diag [   0.06s] ALL.now = x1
+  S6/v5diag [   0.06s] JP.now = j1
+  S6/v5diag [  10.06s] ALL.now = j1
+  S7/v5diag [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S7/v5diag [  26.05s] a: one check 300 ms slower (340 ms), then back to 40 ms
+  S7/v5diag [  26.06s] UT.now = a
+  S7/v5diag [  52.20s] a: 300 ms for good (UT back on a: True)
+  S8/v5diag [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S8/v5diag [   0.05s] UT.now = flaky
+  S8/v5diag [  20.24s] UT.now = steady
+  S9/v5diag [   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+  S9/v5diag [   7.05s] A1: the next connection through u1 times out once
+  S9/v5diag [   7.06s] FB.now = UT
+  S9/v5diag [  14.09s] A2: the next connection through u1 times out once
+  S9/v5diag [  14.09s] FB.now = UT
+  S9/v5diag [  21.18s] A3: the next connection through u1 times out once
+  S9/v5diag [  21.18s] FB.now = UT
+  S9/v5diag [  28.21s] B: u1 hangs for good
+  S9/v5diag [  33.07s] C: u1 works again
+MATRIX_DONE
+  S8/v4 [   0.06s] mihomo started: {'meta': True, 'version': 'sim-v4b'}
+  S8/v4 [   0.06s] UT.now = flaky

@@ -1,0 +1,10 @@
+[   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+[   7.05s] A1: the next connection through u1 times out once
+[   7.06s] FB.now = UT
+[  14.09s] A2: the next connection through u1 times out once
+[  14.09s] FB.now = UT
+[  21.18s] A3: the next connection through u1 times out once
+[  21.18s] FB.now = UT
+[  28.21s] B: u1 hangs for good
+[  33.07s] C: u1 works again
+RESULT {"single_failure_switches": 0, "single_changes": [], "dead_left_after_s": 4.9, "back_after_s": 3.3, "confirm_lines": 4, "fixed": true}

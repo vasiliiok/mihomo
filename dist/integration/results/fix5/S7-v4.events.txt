@@ -1,0 +1,6 @@
+[   0.11s] mihomo started: {'meta': True, 'version': 'sim-v4b'}
+[  26.11s] a: one check 300 ms slower (340 ms), then back to 40 ms
+[  26.11s] UT.now = a
+[  46.16s] UT.now = b
+[  56.27s] a: 300 ms for good (UT back on a: True)
+RESULT {"spike_changes": [[46.16, "UT", "b"]], "back_on_a_before_slowdown": true, "slow_left_after_s": 10.1, "final_UT": "b", "fixed": false}

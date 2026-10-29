@@ -1,0 +1,7 @@
+[   0.06s] mihomo started: {'meta': True, 'version': 'sim-v4b'}
+[   0.07s] ALL.now = <HTTPError>
+[   0.07s] JP.now = <HTTPError>
+[   0.17s] ALL.now = x1
+[   0.17s] JP.now = j1
+[  10.25s] ALL.now = j1
+RESULT {"changes": [[0.07, "ALL", "<HTTPError>"], [0.07, "JP", "<HTTPError>"], [0.17, "ALL", "x1"], [0.17, "JP", "j1"], [10.25, "ALL", "j1"]], "final_ALL": "j1", "x1_tested_with_group_url": false, "j1_tested_with_group_url": true, "fixed": true}

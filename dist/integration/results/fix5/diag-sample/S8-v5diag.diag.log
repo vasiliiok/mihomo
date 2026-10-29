@@ -1,0 +1,119 @@
+2026-10-29T13:26:08.103Z start version=sim-v5 build="unknown time" go=go1.26.10 pid=15776 interval=5s
+2026-10-29T13:26:08.117Z provider-update provider="sim" version=1 proxies=2 initial
+2026-10-29T13:26:08.117Z hc-start provider="sim" round=0207b31c reason=start proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:26:08.121Z config url-test="UT" url=http://127.0.0.1:18204/generate_204 expected="*" tolerance=30 reliability=90 delay_samples=3 max_failed=3 timeout=5000 providers=["sim"] members=2
+2026-10-29T13:26:08.121Z config provider="default" vehicle=Compatible hc_url= interval=0s timeout=5s lazy=true expected="*" extra=[] proxies=3
+2026-10-29T13:26:08.121Z config provider="sim" vehicle=File hc_url=http://127.0.0.1:18204/generate_204 interval=5s timeout=1s lazy=false expected="204" extra=[] proxies=2
+2026-10-29T13:26:08.144Z url-test group="UT" from="" to="flaky" reason=first from_delay=- to_delay=- best="flaky" best_delay=- tol=30 from_ok=- to_ok=- best_ok=- from_last=-
+2026-10-29T13:26:08.181Z hc-node provider="sim" round=0207b31c node="flaky" ok=true delay=31 full=64
+2026-10-29T13:26:08.301Z hc-node provider="sim" round=0207b31c node="steady" ok=true delay=90 full=184
+2026-10-29T13:26:08.302Z hc-end provider="sim" round=0207b31c reason=start tests=2 alive=2 dur=184
+2026-10-29T13:26:08.302Z hc-skip provider="sim" reason=update (joined a running round or reused one that ended <1s ago)
+2026-10-29T13:26:13.117Z hc-start provider="sim" round=bc0c0fda reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:26:13.121Z status url-test="UT" now="flaky" delay=31 best="flaky" best_delay=31 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=4s reason=first dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=1/1 last=31 best_ok=1/1 unreliable=0
+2026-10-29T13:26:13.122Z runtime uptime=5s goroutines=17 heap=2MiB alloc=5MiB sys=17MiB rss=43MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:26:13.181Z hc-node provider="sim" round=bc0c0fda node="flaky" ok=true delay=30 full=62
+2026-10-29T13:26:13.302Z hc-node provider="sim" round=bc0c0fda node="steady" ok=true delay=90 full=183
+2026-10-29T13:26:13.302Z hc-end provider="sim" round=bc0c0fda reason=tick tests=2 alive=2 dur=184
+2026-10-29T13:26:18.118Z hc-start provider="sim" round=3666f4bc reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:26:18.122Z status url-test="UT" now="flaky" delay=31 best="flaky" best_delay=31 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=9s reason=first dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=2/2 last=30 best_ok=2/2 unreliable=0
+2026-10-29T13:26:18.122Z runtime uptime=10s goroutines=15 heap=2MiB alloc=0MiB sys=17MiB rss=43MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:26:18.302Z hc-node provider="sim" round=3666f4bc node="steady" ok=true delay=91 full=183
+2026-10-29T13:26:19.119Z hc-node provider="sim" round=3666f4bc node="flaky" ok=false delay=- full=1000 err="context deadline exceeded"
+2026-10-29T13:26:19.119Z hc-end provider="sim" round=3666f4bc reason=tick tests=2 alive=1 dur=1001
+2026-10-29T13:26:23.119Z hc-start provider="sim" round=40a6e46c reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:26:23.121Z status url-test="UT" now="flaky" delay=- best="steady" best_delay=90 delta=- tol=30 alive=1 dead=1 untested=0 total=2 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=- last=- best_ok=3/3 unreliable=0
+2026-10-29T13:26:23.121Z runtime uptime=15s goroutines=13 heap=2MiB alloc=0MiB sys=17MiB rss=43MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:26:23.184Z hc-node provider="sim" round=40a6e46c node="flaky" ok=true delay=30 full=63
+2026-10-29T13:26:23.304Z hc-node provider="sim" round=40a6e46c node="steady" ok=true delay=91 full=183
+2026-10-29T13:26:23.304Z hc-end provider="sim" round=40a6e46c reason=tick tests=2 alive=2 dur=185
+2026-10-29T13:26:28.118Z hc-start provider="sim" round=75000151 reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:26:28.122Z warn url-test UT: "flaky" is unreliable (3/4 checks ok, needs 90%) while "steady" is reliable (decided 9s ago)
+2026-10-29T13:26:28.122Z status url-test="UT" now="flaky" delay=30 best="steady" best_delay=91 delta=-61 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=9s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=3/4 last=30 best_ok=4/4 unreliable=1
+2026-10-29T13:26:28.122Z runtime uptime=20s goroutines=17 heap=3MiB alloc=0MiB sys=17MiB rss=44MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:26:28.182Z hc-node provider="sim" round=75000151 node="flaky" ok=true delay=31 full=64
+2026-10-29T13:26:28.302Z hc-node provider="sim" round=75000151 node="steady" ok=true delay=91 full=183
+2026-10-29T13:26:28.302Z hc-end provider="sim" round=75000151 reason=tick tests=2 alive=2 dur=183
+2026-10-29T13:26:28.328Z url-test group="UT" from="flaky" to="steady" reason=unreliable from_delay=30 to_delay=91 best="steady" best_delay=91 tol=30 from_ok=4/5 to_ok=5/5 best_ok=5/5 from_last=31
+2026-10-29T13:26:33.118Z hc-start provider="sim" round=274e46eb reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:26:33.122Z status url-test="UT" now="steady" delay=91 best="steady" best_delay=91 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=4s reason=unreliable dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=5/5 last=91 best_ok=5/5 unreliable=1
+2026-10-29T13:26:33.122Z runtime uptime=25s goroutines=15 heap=3MiB alloc=0MiB sys=17MiB rss=44MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:26:33.301Z hc-node provider="sim" round=274e46eb node="steady" ok=true delay=90 full=183
+2026-10-29T13:26:34.118Z hc-node provider="sim" round=274e46eb node="flaky" ok=false delay=- full=1000 err="context deadline exceeded"
+2026-10-29T13:26:34.118Z hc-end provider="sim" round=274e46eb reason=tick tests=2 alive=1 dur=1000
+2026-10-29T13:26:38.117Z hc-start provider="sim" round=be4f5b40 reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:26:38.122Z status url-test="UT" now="steady" delay=91 best="steady" best_delay=91 delta=0 tol=30 alive=1 dead=1 untested=0 total=2 fixed="" decided=9s reason=unreliable dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=6/6 last=90 best_ok=6/6 unreliable=0
+2026-10-29T13:26:38.122Z runtime uptime=30s goroutines=17 heap=3MiB alloc=0MiB sys=17MiB rss=44MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:26:38.181Z hc-node provider="sim" round=be4f5b40 node="flaky" ok=true delay=30 full=63
+2026-10-29T13:26:38.305Z hc-node provider="sim" round=be4f5b40 node="steady" ok=true delay=94 full=188
+2026-10-29T13:26:38.305Z hc-end provider="sim" round=be4f5b40 reason=tick tests=2 alive=2 dur=188
+2026-10-29T13:26:43.118Z hc-start provider="sim" round=28b3fd62 reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:26:43.121Z status url-test="UT" now="steady" delay=91 best="steady" best_delay=91 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=7/7 last=94 best_ok=7/7 unreliable=1
+2026-10-29T13:26:43.121Z runtime uptime=35s goroutines=17 heap=4MiB alloc=0MiB sys=17MiB rss=44MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:26:43.182Z hc-node provider="sim" round=28b3fd62 node="flaky" ok=true delay=31 full=64
+2026-10-29T13:26:43.303Z hc-node provider="sim" round=28b3fd62 node="steady" ok=true delay=90 full=184
+2026-10-29T13:26:43.303Z hc-end provider="sim" round=28b3fd62 reason=tick tests=2 alive=2 dur=184
+2026-10-29T13:26:48.118Z hc-start provider="sim" round=6d307277 reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:26:48.122Z status url-test="UT" now="steady" delay=90 best="steady" best_delay=90 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=9s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=8/8 last=90 best_ok=8/8 unreliable=1
+2026-10-29T13:26:48.122Z runtime uptime=40s goroutines=15 heap=4MiB alloc=0MiB sys=17MiB rss=44MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:26:48.302Z hc-node provider="sim" round=6d307277 node="steady" ok=true delay=90 full=184
+2026-10-29T13:26:49.119Z hc-node provider="sim" round=6d307277 node="flaky" ok=false delay=- full=1000 err="context deadline exceeded"
+2026-10-29T13:26:49.119Z hc-end provider="sim" round=6d307277 reason=tick tests=2 alive=1 dur=1001
+2026-10-29T13:26:53.117Z hc-start provider="sim" round=ff3e6911 reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:26:53.122Z status url-test="UT" now="steady" delay=90 best="steady" best_delay=90 delta=0 tol=30 alive=1 dead=1 untested=0 total=2 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=9/9 last=90 best_ok=9/9 unreliable=0
+2026-10-29T13:26:53.122Z runtime uptime=45s goroutines=17 heap=4MiB alloc=0MiB sys=17MiB rss=45MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:26:53.181Z hc-node provider="sim" round=ff3e6911 node="flaky" ok=true delay=30 full=63
+2026-10-29T13:26:53.303Z hc-node provider="sim" round=ff3e6911 node="steady" ok=true delay=90 full=185
+2026-10-29T13:26:53.303Z hc-end provider="sim" round=ff3e6911 reason=tick tests=2 alive=2 dur=185
+2026-10-29T13:26:58.117Z hc-start provider="sim" round=9a43458b reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:26:58.121Z status url-test="UT" now="steady" delay=90 best="steady" best_delay=90 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=9s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=10/10 last=90 best_ok=10/10 unreliable=1
+2026-10-29T13:26:58.122Z runtime uptime=50s goroutines=17 heap=4MiB alloc=0MiB sys=17MiB rss=45MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:26:58.181Z hc-node provider="sim" round=9a43458b node="flaky" ok=true delay=30 full=63
+2026-10-29T13:26:58.302Z hc-node provider="sim" round=9a43458b node="steady" ok=true delay=90 full=184
+2026-10-29T13:26:58.302Z hc-end provider="sim" round=9a43458b reason=tick tests=2 alive=2 dur=185
+2026-10-29T13:27:03.118Z hc-start provider="sim" round=6b1be8d7 reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:27:03.121Z status url-test="UT" now="steady" delay=90 best="steady" best_delay=90 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=10/10 last=90 best_ok=10/10 unreliable=1
+2026-10-29T13:27:03.121Z runtime uptime=55s goroutines=15 heap=5MiB alloc=0MiB sys=17MiB rss=45MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:27:03.303Z hc-node provider="sim" round=6b1be8d7 node="steady" ok=true delay=91 full=185
+2026-10-29T13:27:04.119Z hc-node provider="sim" round=6b1be8d7 node="flaky" ok=false delay=- full=1000 err="context deadline exceeded"
+2026-10-29T13:27:04.119Z hc-end provider="sim" round=6b1be8d7 reason=tick tests=2 alive=1 dur=1001
+2026-10-29T13:27:08.118Z hc-start provider="sim" round=cddee9ab reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:27:08.121Z status url-test="UT" now="steady" delay=90 best="steady" best_delay=90 delta=0 tol=30 alive=1 dead=1 untested=0 total=2 fixed="" decided=9s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=10/10 last=91 best_ok=10/10 unreliable=0
+2026-10-29T13:27:08.121Z runtime uptime=1m0s goroutines=17 heap=5MiB alloc=0MiB sys=17MiB rss=46MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:27:08.185Z hc-node provider="sim" round=cddee9ab node="flaky" ok=true delay=31 full=66
+2026-10-29T13:27:08.304Z hc-node provider="sim" round=cddee9ab node="steady" ok=true delay=91 full=186
+2026-10-29T13:27:08.304Z hc-end provider="sim" round=cddee9ab reason=tick tests=2 alive=2 dur=186
+2026-10-29T13:27:13.118Z hc-start provider="sim" round=c31eb8c2 reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:27:13.121Z status url-test="UT" now="steady" delay=91 best="steady" best_delay=91 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=10/10 last=91 best_ok=10/10 unreliable=1
+2026-10-29T13:27:13.121Z runtime uptime=1m5s goroutines=17 heap=5MiB alloc=0MiB sys=17MiB rss=46MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:27:13.182Z hc-node provider="sim" round=c31eb8c2 node="flaky" ok=true delay=31 full=63
+2026-10-29T13:27:13.302Z hc-node provider="sim" round=c31eb8c2 node="steady" ok=true delay=91 full=184
+2026-10-29T13:27:13.302Z hc-end provider="sim" round=c31eb8c2 reason=tick tests=2 alive=2 dur=184
+2026-10-29T13:27:18.117Z hc-start provider="sim" round=6292e6f0 reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:27:18.121Z status url-test="UT" now="steady" delay=91 best="steady" best_delay=91 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=9s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=10/10 last=91 best_ok=10/10 unreliable=1
+2026-10-29T13:27:18.122Z runtime uptime=1m10s goroutines=15 heap=6MiB alloc=0MiB sys=17MiB rss=46MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:27:18.301Z hc-node provider="sim" round=6292e6f0 node="steady" ok=true delay=91 full=183
+2026-10-29T13:27:19.118Z hc-node provider="sim" round=6292e6f0 node="flaky" ok=false delay=- full=1000 err="context deadline exceeded"
+2026-10-29T13:27:19.118Z hc-end provider="sim" round=6292e6f0 reason=tick tests=2 alive=1 dur=1000
+2026-10-29T13:27:23.118Z hc-start provider="sim" round=a9912292 reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:27:23.121Z status url-test="UT" now="steady" delay=91 best="steady" best_delay=91 delta=0 tol=30 alive=1 dead=1 untested=0 total=2 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=10/10 last=91 best_ok=10/10 unreliable=0
+2026-10-29T13:27:23.121Z runtime uptime=1m15s goroutines=17 heap=6MiB alloc=0MiB sys=17MiB rss=46MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:27:23.181Z hc-node provider="sim" round=a9912292 node="flaky" ok=true delay=30 full=63
+2026-10-29T13:27:23.302Z hc-node provider="sim" round=a9912292 node="steady" ok=true delay=91 full=184
+2026-10-29T13:27:23.302Z hc-end provider="sim" round=a9912292 reason=tick tests=2 alive=2 dur=184
+2026-10-29T13:27:28.118Z hc-start provider="sim" round=5eaab49e reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:27:28.122Z status url-test="UT" now="steady" delay=91 best="steady" best_delay=91 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=9s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=10/10 last=91 best_ok=10/10 unreliable=1
+2026-10-29T13:27:28.122Z runtime uptime=1m20s goroutines=17 heap=6MiB alloc=0MiB sys=17MiB rss=47MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:27:28.182Z hc-node provider="sim" round=5eaab49e node="flaky" ok=true delay=30 full=64
+2026-10-29T13:27:28.304Z hc-node provider="sim" round=5eaab49e node="steady" ok=true delay=90 full=186
+2026-10-29T13:27:28.304Z hc-end provider="sim" round=5eaab49e reason=tick tests=2 alive=2 dur=186
+2026-10-29T13:27:33.118Z hc-start provider="sim" round=57af98ab reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:27:33.122Z status url-test="UT" now="steady" delay=91 best="steady" best_delay=91 delta=0 tol=30 alive=2 dead=0 untested=0 total=2 fixed="" decided=4s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=10/10 last=90 best_ok=10/10 unreliable=1
+2026-10-29T13:27:33.122Z runtime uptime=1m25s goroutines=15 heap=7MiB alloc=0MiB sys=21MiB rss=47MiB gc=2 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:27:33.301Z hc-node provider="sim" round=57af98ab node="steady" ok=true delay=91 full=183
+2026-10-29T13:27:34.118Z hc-node provider="sim" round=57af98ab node="flaky" ok=false delay=- full=1000 err="context deadline exceeded"
+2026-10-29T13:27:34.118Z hc-end provider="sim" round=57af98ab reason=tick tests=2 alive=1 dur=1000
+2026-10-29T13:27:38.118Z hc-start provider="sim" round=3859d0d3 reason=tick proxies=2 version=1 url=http://127.0.0.1:18204/generate_204 extra=[]
+2026-10-29T13:27:38.121Z status url-test="UT" now="steady" delay=91 best="steady" best_delay=91 delta=0 tol=30 alive=1 dead=1 untested=0 total=2 fixed="" decided=9s reason=keep dial_ok=0 dial_fail=0 hc_ok=0 hc_fail=0 ok=10/10 last=91 best_ok=10/10 unreliable=0
+2026-10-29T13:27:38.122Z runtime uptime=1m30s goroutines=17 heap=6MiB alloc=0MiB sys=21MiB rss=48MiB gc=3 conns=0 new_conns=0 up=0MiB down=0MiB
+2026-10-29T13:27:38.182Z hc-node provider="sim" round=3859d0d3 node="flaky" ok=true delay=30 full=64

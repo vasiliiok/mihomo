@@ -1,0 +1,4 @@
+[   0.05s] mihomo started: {'meta': True, 'version': 'sim-v5'}
+[   0.05s] UT.now = flaky
+[  20.18s] UT.now = steady
+RESULT {"switches": 1, "share_on_flaky": 0.22, "flaky_last_checks": [30, 31, 0, 30, 31, 0, 30, 30, 0, 30], "changes": [[0.05, "flaky"], [20.18, "steady"]], "fixed": true}
