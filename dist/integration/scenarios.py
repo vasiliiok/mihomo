@@ -466,7 +466,9 @@ def s8(run):
     checks = [h["delay"] for h in flaky.get("extra", {}).get(URL, {}).get("history", [])]
     run.result = {"switches": len(changes) - 1, "share_on_flaky": round(on_flaky / polls, 2),
                   "flaky_last_checks": checks, "changes": changes[:12]}
-    run.result["fixed"] = len(changes) <= 3
+    # a build that ignores reliability either flaps or, when its 10 s pick cache happens to
+    # miss the dead windows, stays on the flaky node: judge by the time spent on it
+    run.result["fixed"] = on_flaky / polls < 0.5 and len(changes) <= 3
 
 
 # ---- S9: a fallback member fails one check, then fails for real (fail-confirm)
