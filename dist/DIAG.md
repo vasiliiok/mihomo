@@ -90,7 +90,8 @@ OUT=/root/mihomo-diag-$(date +%Y%m%d-%H%M).tar.gz
 T=$(mktemp -d)
 cp $(ls -1 $D/diag-*.log* | tail -n 3) "$T"/
 journalctl -u mihomo --since "48 hours ago" -o short-iso --no-pager | grep -E 'systemd\[1\]|panic|fatal error|goroutine [0-9]+ \[' > "$T/journal-lifecycle.txt"
-/usr/local/bin/mihomo -v > "$T/version.txt" 2>&1
+B=$(systemctl show -p ExecStart --value mihomo | sed -n 's/.*path=\([^ ;]*\).*/\1/p')
+"${B:-mihomo}" -v > "$T/version.txt" 2>&1
 tar -C "$T" -czf "$OUT" .
 rm -rf "$T"
 ls -la "$OUT"
@@ -107,11 +108,14 @@ pct exec 101 -- sh -c '
 T=$(mktemp -d)
 cd /var/log/mihomo-diag && cp $(ls -1 diag-*.log* | tail -n 3) "$T"/
 journalctl -u mihomo --since "48 hours ago" -o short-iso --no-pager | grep -E "systemd\[1\]|panic|fatal error|goroutine [0-9]+ \[" > "$T/journal-lifecycle.txt"
-/usr/local/bin/mihomo -v > "$T/version.txt" 2>&1
+B=$(systemctl show -p ExecStart --value mihomo | sed -n "s/.*path=\([^ ;]*\).*/\1/p")
+"${B:-mihomo}" -v > "$T/version.txt" 2>&1
 tar -C "$T" -czf - . ; rm -rf "$T"' > /root/mihomo-diag-$(date +%Y%m%d-%H%M).tar.gz
 ls -la /root/mihomo-diag-*.tar.gz
 ```
 
+* Версию берём у того бинарника, который запускает служба (путь — из `ExecStart`), поэтому команда
+  работает, где бы mihomo ни лежал.
 * В архив попадают три последних дневных файла — сегодня и два полных предыдущих дня (то есть не меньше
   48 часов), из журнала systemd — только строки о запусках/остановках службы и о падениях (panic), и
   версия mihomo. Обычный журнал mihomo с соединениями гостей в архив **не** попадает.

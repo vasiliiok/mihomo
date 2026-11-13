@@ -32,7 +32,9 @@ def unquote(v):
 
 
 def parse(line):
-    parts = line.rstrip("\n").split(" ", 2)
+    # A power loss can leave a run of NUL bytes where the last lines before it were;
+    # the next line (often the start line after the reboot) follows right after them.
+    parts = line.replace("\0", "").rstrip("\n").split(" ", 2)
     if len(parts) < 2:
         return None
     try:
